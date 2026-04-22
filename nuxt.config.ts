@@ -1,6 +1,10 @@
 export default defineNuxtConfig({
   compatibilityDate: '2026-03-31',
 
+  css: [
+    '~/assets/css/global.css'
+  ],
+
   app: {
     head: {
       script: [
@@ -8,10 +12,6 @@ export default defineNuxtConfig({
           src: 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9132261570607637',
           async: true,
           crossorigin: 'anonymous'
-        },
-           {
-          src: 'https://pl29208547.profitablecpmratenetwork.com/2a/00/c2/2a00c2ee0d30de9a8b21a23c3f21e363.js',
-       
         },
         {
           src: 'https://pl29208548.profitablecpmratenetwork.com/2361b580da27d32bb79de3389aa0d507/invoke.js',

@@ -19,14 +19,17 @@ const watchUrl = `https://www.youtube.com/watch?v=${videoId}`
     </div>
 
     <div class="live-info">
-      <p class="live-title">Directo oficial de la ISS</p>
+      <div class="live-header">
+        <span class="badge badge-live">● LIVE</span>
+        <p class="live-title">Directo oficial de la ISS</p>
+      </div>
       <p class="live-subtitle">NASA YouTube</p>
 
       <a
         :href="watchUrl"
         target="_blank"
         rel="noopener noreferrer"
-        class="live-link"
+        class="btn btn-secondary btn-block live-link"
       >
         Abrir en YouTube
       </a>
@@ -39,9 +42,10 @@ const watchUrl = `https://www.youtube.com/watch?v=${videoId}`
   position: relative;
   width: 100%;
   padding-top: 56.25%;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   overflow: hidden;
   background: #000;
+  border: 1px solid var(--border);
 }
 
 .video-wrapper iframe {
@@ -52,30 +56,30 @@ const watchUrl = `https://www.youtube.com/watch?v=${videoId}`
 }
 
 .live-info {
-  margin-top: 12px;
+  margin-top: 14px;
+}
+
+.live-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .live-title {
-  margin: 0 0 4px;
+  margin: 0;
+  color: var(--text);
   font-weight: 700;
 }
 
 .live-subtitle {
-  margin: 0 0 10px;
-  color: #bdbdbd;
-  font-size: 14px;
+  margin: 4px 0 12px;
+  color: var(--text-soft);
+  font-size: 0.88rem;
 }
 
 .live-link {
-  display: inline-block;
-  padding: 10px 14px;
-  border-radius: 10px;
-  background: #2a2a2a;
-  color: white;
   text-decoration: none;
-}
-
-.live-link:hover {
-  background: #3a3a3a;
+  margin-top: 4px;
 }
 </style>

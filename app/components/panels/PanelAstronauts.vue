@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
-import { useIss } from '../composables/useIss'
+import { useIss } from '../../composables/useIss'
 
 const {
   astronauts,
@@ -47,8 +47,8 @@ onMounted(async () => {
 
 <template>
   <div class="section-content">
-    <p v-if="loadingAstronauts && !hasAstronauts">Cargando astronautas...</p>
-    <p v-else-if="errorAstronauts && !hasAstronauts">{{ errorAstronauts }}</p>
+    <p v-if="loadingAstronauts && !hasAstronauts" class="loading-msg">Cargando astronautas...</p>
+    <p v-else-if="errorAstronauts && !hasAstronauts" class="soft-error">{{ errorAstronauts }}</p>
 
     <template v-else-if="hasAstronauts">
       <div class="astronauts-grid">
@@ -88,13 +88,26 @@ onMounted(async () => {
 
               <p class="meta" v-if="astronaut.country">{{ astronaut.country }}</p>
               <p class="meta" v-if="astronaut.agency">{{ astronaut.agency }}</p>
-              <p class="role" v-if="astronaut.role">{{ astronaut.role }}</p>
+              <p class="role" v-if="astronaut.role">
+                <span class="badge badge-success">{{ astronaut.role }}</span>
+              </p>
             </div>
           </div>
 
           <p v-if="astronaut.bio" class="bio">
             {{ astronaut.bio }}
           </p>
+
+          <NuxtLink
+            :to="{ path: '/tripulacion', query: { astronaut: astronaut.id } }"
+            class="learn-more"
+          >
+            Saber más
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </NuxtLink>
         </article>
       </div>
 
@@ -103,7 +116,7 @@ onMounted(async () => {
       </p>
     </template>
 
-    <p v-else>No hay astronautas disponibles.</p>
+    <p v-else class="loading-msg">No hay astronautas disponibles.</p>
   </div>
 </template>
 
@@ -114,15 +127,22 @@ onMounted(async () => {
 }
 
 .astronaut-card {
-  border: 1px solid #2b2b2b;
-  border-radius: 12px;
-  padding: 12px;
-  background: #171717;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 14px;
+  background: var(--surface-3);
+  transition: background 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+}
+
+.astronaut-card:hover {
+  background: var(--surface-2);
+  border-color: var(--primary);
+  transform: translateY(-1px);
 }
 
 .astronaut-top {
   display: flex;
-  gap: 12px;
+  gap: 14px;
   align-items: flex-start;
 }
 
@@ -133,10 +153,11 @@ onMounted(async () => {
 .avatar {
   width: 68px;
   height: 68px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   object-fit: cover;
   display: block;
-  background: #242424;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
 }
 
 .avatar-fallback {
@@ -144,8 +165,9 @@ onMounted(async () => {
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  color: #fff;
-  background: #2a2a2a;
+  color: var(--text);
+  background: linear-gradient(135deg, var(--surface-2), #243754);
+  font-size: 1.1rem;
 }
 
 .main-info {
@@ -157,19 +179,22 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-wrap: wrap;
 }
 
 .name {
   margin: 0;
-  font-size: 16px;
+  font-size: 1rem;
   line-height: 1.2;
+  color: var(--text);
+  font-weight: 700;
 }
 
 .flag-img {
   width: 22px;
   height: 16px;
   object-fit: cover;
-  border-radius: 2px;
+  border-radius: 3px;
 }
 
 .flag-emoji {
@@ -184,26 +209,48 @@ onMounted(async () => {
 }
 
 .meta {
-  color: #cfcfcf;
-  font-size: 14px;
+  color: var(--text-soft);
+  font-size: 0.88rem;
 }
 
 .role {
-  color: #9fd3ff;
-  font-size: 13px;
   text-transform: capitalize;
 }
 
 .bio {
   margin-top: 10px;
-  color: #d9d9d9;
-  font-size: 14px;
-  line-height: 1.45;
+  color: var(--text-soft);
+  font-size: 0.9rem;
+  line-height: 1.55;
 }
 
-.soft-error {
-  margin-top: 10px;
-  font-size: 12px;
-  color: #ffb3b3;
+.learn-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--accent);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease, color 0.2s ease;
+}
+
+.learn-more:hover {
+  background: var(--surface);
+  border-color: var(--accent);
+  transform: translateX(2px);
+}
+
+.learn-more svg {
+  transition: transform 0.2s ease;
+}
+
+.learn-more:hover svg {
+  transform: translateX(2px);
 }
 </style>

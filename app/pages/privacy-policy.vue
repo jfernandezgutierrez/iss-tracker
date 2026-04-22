@@ -1,5 +1,6 @@
 <template>
-  <div class="page">
+  <div class="content-page">
+    <p class="eyebrow">ISS Tracker</p>
     <h1>Política de Privacidad</h1>
 
     <p>
@@ -18,7 +19,7 @@
 
     <p>
       Puedes desactivar la personalización de anuncios en:
-      <a href="https://adssettings.google.com" target="_blank">
+      <a href="https://adssettings.google.com" target="_blank" rel="noopener noreferrer">
         https://adssettings.google.com
       </a>
     </p>
@@ -34,11 +35,3 @@
     </p>
   </div>
 </template>
-
-<style scoped>
-.page {
-  padding: 20px;
-  max-width: 900px;
-  margin: auto;
-}
-</style>

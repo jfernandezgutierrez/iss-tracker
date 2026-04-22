@@ -1,6 +1,6 @@
 <script setup>
-import MapISS from '../components/MapISS.vue'
-import PanelISS from '../components/PanelISS.vue'
+import MapISS from '../components/map/MapISS.vue'
+import PanelISS from '../components/panels/PanelISS.vue'
 import { ref, computed, onBeforeUnmount, nextTick } from 'vue'
 
 const leftWidth = ref(70)
@@ -80,6 +80,7 @@ onBeforeUnmount(() => {
   height: calc(100vh - 60px);
   display: flex;
   min-height: 0;
+  background: var(--bg);
 }
 
 .map-container,
@@ -91,13 +92,14 @@ onBeforeUnmount(() => {
 
 .resizer {
   width: 8px;
-  background: #2a2a2a;
+  background: var(--surface-2);
   cursor: col-resize;
   flex-shrink: 0;
+  transition: background 0.2s ease;
 }
 
 .resizer:hover {
-  background: #4a4a4a;
+  background: var(--primary);
 }
 
 @media (max-width: 768px) {

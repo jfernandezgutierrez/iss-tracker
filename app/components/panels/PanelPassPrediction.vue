@@ -44,7 +44,7 @@ function visibilityText(visible: boolean) {
 }
 
 function visibilityClass(visible: boolean) {
-    return visible ? 'visible' : 'not-visible'
+    return visible ? 'badge badge-success' : 'badge badge-danger'
 }
 function isValidCoordinate(value: string, min: number, max: number) {
     const num = Number(value)
@@ -132,29 +132,34 @@ function formatDuration(seconds: number) {
         </div>
 
         <div class="actions">
-            <button class="secondary-btn" @click="useMyLocation">
+            <button class="btn btn-secondary" @click="useMyLocation">
                 Usar mi ubicación
             </button>
 
-            <button class="primary-btn" @click="calculatePass">
-                Calcular paso
+            <button class="btn btn-primary" @click="calculatePass" :disabled="loading">
+                {{ loading ? 'Calculando...' : 'Calcular paso' }}
             </button>
         </div>
 
         <p v-if="loading" class="status-msg">Calculando próximos pasos...</p>
-        <p v-else-if="error" class="error-msg">{{ error }}</p>
+        <p v-else-if="error" class="soft-error">{{ error }}</p>
 
         <div v-else-if="hasResults" class="results">
             <div v-for="(item, index) in results" :key="`${item.risetime}-${index}`" class="result-card">
-                <p><strong>Paso:</strong> {{ index + 1 }}</p>
-                <p><strong>Hora:</strong> {{ formatDate(item.risetime) }}</p>
-                <p><strong>Duración:</strong> {{ formatDuration(item.duration) }}</p>
-                <p>
-                    <strong>Visibilidad:</strong>
+                <div class="result-header">
+                    <span class="result-index">Paso #{{ index + 1 }}</span>
                     <span :class="visibilityClass(item.visible)">
                         {{ visibilityText(item.visible) }}
                     </span>
-                </p>
+                </div>
+                <div class="result-row">
+                    <span class="result-label">Hora</span>
+                    <strong>{{ formatDate(item.risetime) }}</strong>
+                </div>
+                <div class="result-row">
+                    <span class="result-label">Duración</span>
+                    <strong>{{ formatDuration(item.duration) }}</strong>
+                </div>
             </div>
         </div>
 
@@ -167,32 +172,13 @@ function formatDuration(seconds: number) {
 <style scoped>
 .form-grid {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
     gap: 12px;
 }
 
 .field {
     display: flex;
     flex-direction: column;
-}
-
-label {
-    margin-bottom: 6px;
-    font-size: 14px;
-    color: #d6d6d6;
-}
-
-input {
-    padding: 10px 12px;
-    border: 1px solid #2f2f2f;
-    border-radius: 10px;
-    background: #101010;
-    color: #fff;
-    outline: none;
-}
-
-input:focus {
-    border-color: #4c8dff;
 }
 
 .actions {
@@ -202,57 +188,67 @@ input:focus {
     margin-top: 14px;
 }
 
-button {
-    border: none;
-    border-radius: 10px;
-    padding: 10px 14px;
-    cursor: pointer;
-    font-weight: 600;
-}
-
-.primary-btn {
-    background: #2d6cdf;
-    color: white;
-}
-
-.secondary-btn {
-    background: #2a2a2a;
-    color: white;
-}
-
 .status-msg,
-.error-msg,
 .empty-msg {
     margin-top: 14px;
-}
-
-.error-msg {
-    color: #ff9d9d;
+    color: var(--text-soft);
+    font-size: 0.9rem;
 }
 
 .results {
     display: grid;
     gap: 10px;
-    margin-top: 14px;
+    margin-top: 16px;
 }
 
 .result-card {
-    background: #181818;
-    border: 1px solid #2b2b2b;
-    border-radius: 12px;
-    padding: 12px;
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 14px;
+    transition: border-color 0.2s ease, transform 0.2s ease;
 }
 
-.result-card p {
-    margin: 6px 0;
-}
-.visible {
-  color: #4caf50;
-  font-weight: 600;
+.result-card:hover {
+    border-color: var(--primary);
+    transform: translateY(-1px);
 }
 
-.not-visible {
-  color: #ff6b6b;
-  font-weight: 600;
+.result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.result-index {
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+}
+
+.result-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    font-size: 0.9rem;
+    border-top: 1px solid var(--border-soft);
+}
+
+.result-label {
+    color: var(--text-soft);
+}
+
+.result-row strong {
+    color: var(--text);
+    font-weight: 600;
+}
+
+@media (max-width: 480px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
 }
 </style>
