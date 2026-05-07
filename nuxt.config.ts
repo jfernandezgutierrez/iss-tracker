@@ -59,21 +59,6 @@ export default defineNuxtConfig({
         { rel: 'manifest', href: '/manifest.webmanifest' }
       ],
       script: [
-        // Google Consent Mode v2: deniega todo por defecto hasta que el usuario acepte
-        {
-          innerHTML: `
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('consent', 'default', {
-              ad_storage: 'denied',
-              ad_user_data: 'denied',
-              ad_personalization: 'denied',
-              analytics_storage: 'denied',
-              wait_for_update: 2000
-            });
-            gtag('js', new Date());
-          `
-        },
         {
           src: 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9132261570607637',
           async: true,
