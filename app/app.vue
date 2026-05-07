@@ -1,11 +1,13 @@
 <script setup>
 import Header from './components/layout/Header.vue'
+import CookieBanner from './components/layout/CookieBanner.vue'
 </script>
 
 <template>
   <div class="app">
     <Header />
     <NuxtPage />
+    <CookieBanner />
   </div>
 </template>
 

@@ -57,6 +57,7 @@ onBeforeUnmount(() => {
       <NuxtLink to="/directos" title="Directos de la NASA y la ISS" @click="closeMenu">Directos</NuxtLink>
       <NuxtLink to="/historia" title="Historia y estadísticas de la ISS" @click="closeMenu">Historia</NuxtLink>
       <NuxtLink to="/galeria" title="Galería de fotos de la NASA" @click="closeMenu">Galería</NuxtLink>
+      <NuxtLink to="/noticias" title="Noticias sobre la ISS y la NASA" @click="closeMenu">Noticias</NuxtLink>
       <NuxtLink to="/contact" title="Contacto" @click="closeMenu">Contacto</NuxtLink>
       <NuxtLink to="/privacy-policy" title="Política de privacidad" @click="closeMenu">Privacidad</NuxtLink>
     </nav>
