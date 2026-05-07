@@ -12,7 +12,7 @@
   "dependencies": {
     "leaflet": "^1.9.4",
     "nuxt": "^4.4.2",
-    "satellite.js": "^7.0.0",
+    "satellite.js": "^5.0.0",
     "suncalc": "^1.9.0",
     "vue": "^3.5.30",
     "vue-router": "^5.0.4"

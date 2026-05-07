@@ -3,6 +3,29 @@ import MapISS from '../components/map/MapISS.vue'
 import PanelISS from '../components/panels/PanelISS.vue'
 import { ref, computed, onBeforeUnmount, nextTick } from 'vue'
 
+useHead({
+  title: 'ISS en tiempo real — Mapa en vivo de la Estación Espacial Internacional',
+  meta: [
+    {
+      name: 'description',
+      content: 'Mira dónde está la ISS ahora mismo en un mapa en vivo. Sigue la órbita, consulta la tripulación a bordo, calcula el próximo paso de la Estación Espacial Internacional sobre tu ubicación y accede a los directos oficiales de la NASA.'
+    },
+    {
+      name: 'keywords',
+      content: 'dónde está la ISS ahora, ISS en tiempo real, mapa ISS, seguir ISS, posición actual Estación Espacial Internacional, órbita ISS, trayectoria ISS'
+    },
+    { property: 'og:title', content: 'ISS en tiempo real — Mapa en vivo de la Estación Espacial Internacional' },
+    {
+      property: 'og:description',
+      content: 'Posición en directo de la ISS sobre el mapa, tripulación actual y directos de la NASA.'
+    },
+    { property: 'og:url', content: 'https://isstrackerlive.es/' }
+  ],
+  link: [
+    { rel: 'canonical', href: 'https://isstrackerlive.es/' }
+  ]
+})
+
 const leftWidth = ref(70)
 const isDragging = ref(false)
 const mapRef = ref(null)
@@ -63,13 +86,22 @@ onBeforeUnmount(() => {
 
 <template>
   <main class="main">
-    <section class="map-container" :style="leftStyle">
+    <!-- Encabezado SEO oculto visualmente pero leído por buscadores y lectores de pantalla -->
+    <h1 class="visually-hidden">
+      ISS Tracker en tiempo real: posición actual de la Estación Espacial Internacional sobre el mapa
+    </h1>
+    <p class="visually-hidden">
+      Sigue la órbita de la ISS en directo, consulta la tripulación a bordo, los directos oficiales
+      de la NASA y calcula cuándo pasará la Estación Espacial Internacional sobre tu ubicación.
+    </p>
+
+    <section class="map-container" :style="leftStyle" aria-label="Mapa en vivo de la Estación Espacial Internacional">
       <MapISS ref="mapRef" />
     </section>
 
-    <div class="resizer" @mousedown="startDragging"></div>
+    <div class="resizer" @mousedown="startDragging" role="separator" aria-label="Redimensionar mapa y panel"></div>
 
-    <section class="panel-container" :style="rightStyle">
+    <section class="panel-container" :style="rightStyle" aria-label="Datos en tiempo real de la ISS">
       <PanelISS />
     </section>
   </main>
@@ -100,6 +132,19 @@ onBeforeUnmount(() => {
 
 .resizer:hover {
   background: var(--primary);
+}
+
+/* Utilidad para texto accesible pero visualmente oculto */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 @media (max-width: 768px) {

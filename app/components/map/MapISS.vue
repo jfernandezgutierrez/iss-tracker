@@ -10,28 +10,24 @@
 
         <!-- Toggle único para seguir / dejar de seguir la ISS -->
         <Transition name="fade">
-            <button
-                v-if="!showSpinner"
-                class="follow-btn"
-                :class="{ 'is-active': follow }"
-                type="button"
+            <button v-if="!showSpinner" class="follow-btn" :class="{ 'is-active': follow }" type="button"
                 :aria-pressed="follow"
-                @click="toggleFollow"
-            >
+                :aria-label="follow ? 'Dejar de seguir la ISS en el mapa' : 'Seguir la ISS en el mapa'"
+                @click="toggleFollow">
                 <span class="follow-dot"></span>
                 {{ follow ? 'Siguiendo a la ISS' : 'Seguir a la ISS' }}
             </button>
         </Transition>
 
         <!-- Leyenda de la órbita -->
-        <div class="orbit-legend" v-if="!showSpinner">
+        <div class="orbit-legend" v-if="!showSpinner" aria-label="Leyenda de la órbita de la ISS">
             <div class="legend-row">
                 <span class="legend-swatch swatch-past"></span>
-                Recorrido hecho
+                Órbita recorrida
             </div>
             <div class="legend-row">
                 <span class="legend-swatch swatch-future"></span>
-                Siguiente órbita
+                Próxima órbita
             </div>
         </div>
     </div>
@@ -178,6 +174,11 @@ onMounted(async () => {
         iconUrl: '/iss-icon.svg',
         iconSize: [50, 50],
         iconAnchor: [25, 25],
+        // Texto alternativo para accesibilidad y SEO (Leaflet lo usa como alt del <img>)
+        // en el marcador del mapa.
+        // @ts-ignore — `alt` es una opción válida en runtime aunque no figure en los tipos antiguos
+        alt: 'Estación Espacial Internacional (ISS)',
+        title: 'Estación Espacial Internacional (ISS)'
     })
 
     // Si el usuario arrastra el mapa, paramos el seguimiento
@@ -362,8 +363,17 @@ onUnmounted(() => {
 }
 
 @keyframes pulse-dot {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.4; transform: scale(0.7); }
+
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.4;
+        transform: scale(0.7);
+    }
 }
 
 /* ===================== Leyenda ===================== */
@@ -427,3 +437,4 @@ onUnmounted(() => {
     }
 }
 </style>
+                                               

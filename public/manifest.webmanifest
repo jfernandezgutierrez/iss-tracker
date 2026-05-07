@@ -1,0 +1,49 @@
+{
+  "name": "ISS Tracker — Estación Espacial Internacional en directo",
+  "short_name": "ISS Tracker",
+  "description": "Sigue la posición en tiempo real de la Estación Espacial Internacional, la tripulación a bordo, los directos de la NASA y el próximo paso de la ISS sobre tu ubicación.",
+  "lang": "es-ES",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0B1220",
+  "theme_color": "#0B1220",
+  "categories": ["education", "navigation", "utilities"],
+  "icons": [
+    {
+      "src": "/pwa-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/maskable-icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Tripulación",
+      "short_name": "Tripulación",
+      "description": "Astronautas a bordo de la ISS ahora mismo",
+      "url": "/tripulacion",
+      "icons": [{ "src": "/pwa-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Directos NASA",
+      "short_name": "Directos",
+      "description": "Streams oficiales de la NASA y NASA TV",
+      "url": "/directos",
+      "icons": [{ "src": "/pwa-192x192.png", "sizes": "192x192" }]
+    }
+  ]
+}

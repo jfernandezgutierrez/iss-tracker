@@ -1,19 +1,43 @@
+<script setup lang="ts">
+useHead({
+  title: 'Contacto — ISS Tracker',
+  meta: [
+    {
+      name: 'description',
+      content: 'Contacta con ISS Tracker: envía tus dudas, sugerencias o reporta un problema de la web. Atendemos cada mensaje personalmente lo antes posible.'
+    },
+    { name: 'robots', content: 'index, follow' },
+    { property: 'og:title', content: 'Contacto — ISS Tracker' },
+    {
+      property: 'og:description',
+      content: 'Ponte en contacto con el equipo de ISS Tracker para dudas, sugerencias o reportar incidencias.'
+    },
+    { property: 'og:url', content: 'https://isstrackerlive.es/contact' }
+  ],
+  link: [
+    { rel: 'canonical', href: 'https://isstrackerlive.es/contact' }
+  ]
+})
+</script>
+
 <template>
   <div class="content-page">
     <p class="eyebrow">ISS Tracker</p>
     <h1>Contacto</h1>
 
     <p>
-      Si tienes alguna duda, sugerencia o problema con la web puedes contactar mediante el siguiente correo:
+      ¿Tienes alguna duda, sugerencia, quieres colaborar o has detectado un problema en ISS Tracker?
+      Estaremos encantados de leerte. Escríbenos al siguiente correo y te responderemos lo antes posible:
     </p>
 
-    <a class="email-card" href="mailto:javiusxia@gmail.com">
-      <span class="email-label">Email</span>
+    <a class="email-card" href="mailto:javiusxia@gmail.com" aria-label="Enviar correo a javiusxia@gmail.com">
+      <span class="email-label">Email de contacto</span>
       <span class="email-value">javiusxia@gmail.com</span>
     </a>
 
     <p>
-      Intentaremos responder lo antes posible.
+      Intentaremos responder a todos los mensajes en el menor tiempo posible. Gracias por usar
+      ISS Tracker para seguir en directo la Estación Espacial Internacional.
     </p>
   </div>
 </template>

@@ -40,7 +40,7 @@ onBeforeUnmount(() => {
 
 <template>
   <header class="header">
-    <NuxtLink to="/" class="logo" @click="closeMenu">
+    <NuxtLink to="/" class="logo" @click="closeMenu" aria-label="ISS Tracker — Página de inicio">
       <span class="logo-dot"></span>
       ISS Tracker
     </NuxtLink>
@@ -50,12 +50,15 @@ onBeforeUnmount(() => {
       class="nav"
       :class="{ 'is-open': menuOpen }"
       :aria-hidden="!menuOpen ? 'true' : 'false'"
+      aria-label="Navegación principal"
     >
-      <NuxtLink to="/" exact-active-class="router-link-active" @click="closeMenu">Mapa</NuxtLink>
-      <NuxtLink to="/tripulacion" @click="closeMenu">Tripulación</NuxtLink>
-      <NuxtLink to="/directos" @click="closeMenu">Directos</NuxtLink>
-      <NuxtLink to="/contact" @click="closeMenu">Contacto</NuxtLink>
-      <NuxtLink to="/privacy-policy" @click="closeMenu">Privacidad</NuxtLink>
+      <NuxtLink to="/" exact-active-class="router-link-active" title="Mapa en vivo de la ISS" @click="closeMenu">Mapa</NuxtLink>
+      <NuxtLink to="/tripulacion" title="Tripulación actual de la ISS" @click="closeMenu">Tripulación</NuxtLink>
+      <NuxtLink to="/directos" title="Directos de la NASA y la ISS" @click="closeMenu">Directos</NuxtLink>
+      <NuxtLink to="/historia" title="Historia y estadísticas de la ISS" @click="closeMenu">Historia</NuxtLink>
+      <NuxtLink to="/galeria" title="Galería de fotos de la NASA" @click="closeMenu">Galería</NuxtLink>
+      <NuxtLink to="/contact" title="Contacto" @click="closeMenu">Contacto</NuxtLink>
+      <NuxtLink to="/privacy-policy" title="Política de privacidad" @click="closeMenu">Privacidad</NuxtLink>
     </nav>
 
     <!-- Botón hamburguesa (solo visible en móvil vía CSS) -->
@@ -134,9 +137,9 @@ onBeforeUnmount(() => {
   text-decoration: none;
   color: var(--text-soft);
   background: var(--surface-2);
-  padding: 8px 14px;
+  padding: 7px 10px;
   border-radius: var(--radius-md);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   transition: all 0.2s ease;
   border: 1px solid transparent;

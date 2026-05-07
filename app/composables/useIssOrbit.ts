@@ -14,7 +14,9 @@ const futurePath = ref<OrbitPoint[]>([])
 const loadingOrbit = ref(false)
 const errorOrbit = ref<string | null>(null)
 
-let satrec: satellite.SatRec | null = null
+// Tipamos como `any` para ser compatibles con v5 y v7 de satellite.js
+// (el nombre del tipo ha cambiado entre versiones, pero la API runtime es idéntica).
+let satrec: any = null
 let tleFetchedAt = 0
 let refreshInterval: ReturnType<typeof setInterval> | null = null
 
@@ -26,15 +28,53 @@ const STEP_SECONDS = 30
 // Re-fetch del TLE cada 6h (son válidos varias horas)
 const TLE_MAX_AGE_MS = 6 * 60 * 60 * 1000
 
-async function fetchAndParseTle() {
-  const { line1, line2 } = await $fetch<{ line1: string; line2: string }>('/api/iss-tle')
-  if (!line1 || !line2) {
-    throw new Error('TLE vacío recibido del servidor')
+// APIs públicas con CORS abierto. Probamos en orden hasta que una funcione.
+// NORAD ID de la ISS (Zarya) = 25544.
+const TLE_SOURCES: Array<() => Promise<{ line1: string; line2: string }>> = [
+  // 1) API abierta de Ivan Stanojevic (CORS abierto, gratis, sin key)
+  async () => {
+    const data = await $fetch<{ line1: string; line2: string }>(
+      'https://tle.ivanstanojevic.me/api/tle/25544'
+    )
+    return { line1: data.line1, line2: data.line2 }
+  },
+  // 2) Wheretheiss.at — también expone TLE con CORS abierto como fallback
+  async () => {
+    const data = await $fetch<{ tle: string }>(
+      'https://api.wheretheiss.at/v1/satellites/25544/tles?format=json'
+    )
+    const lines = (data.tle || '')
+      .split('\n')
+      .map(l => l.trim())
+      .filter(Boolean)
+    const line1 = lines.find(l => l.startsWith('1 ')) || ''
+    const line2 = lines.find(l => l.startsWith('2 ')) || ''
+    return { line1, line2 }
   }
-  satrec = satellite.twoline2satrec(line1, line2)
-  tleFetchedAt = Date.now()
-  // eslint-disable-next-line no-console
-  console.info('[useIssOrbit] TLE cargado correctamente')
+]
+
+async function fetchAndParseTle() {
+  let lastError: any = null
+
+  for (const source of TLE_SOURCES) {
+    try {
+      const { line1, line2 } = await source()
+      if (!line1 || !line2) {
+        throw new Error('TLE vacío o malformado')
+      }
+      satrec = satellite.twoline2satrec(line1, line2)
+      tleFetchedAt = Date.now()
+      // eslint-disable-next-line no-console
+      console.info('[useIssOrbit] TLE cargado correctamente')
+      return
+    } catch (err) {
+      lastError = err
+      // eslint-disable-next-line no-console
+      console.warn('[useIssOrbit] Fuente TLE fallida, probando siguiente:', err)
+    }
+  }
+
+  throw lastError || new Error('No se pudo obtener el TLE de ninguna fuente')
 }
 
 function propagateAt(date: Date): OrbitPoint | null {
@@ -45,7 +85,7 @@ function propagateAt(date: Date): OrbitPoint | null {
   if (!eci || typeof eci === 'boolean') return null
 
   const gmst = satellite.gstime(date)
-  const geodetic = satellite.eciToGeodetic(eci as satellite.EciVec3<number>, gmst)
+  const geodetic = satellite.eciToGeodetic(eci as any, gmst)
 
   return {
     latitude: satellite.degreesLat(geodetic.latitude),
@@ -135,6 +175,18 @@ export function useIssOrbit() {
     startOrbitRefresh,
     stopOrbitRefresh
   }
+}
+
+/**
+ * Devuelve el satrec actual, cargándolo si hiciera falta.
+ * Lo usamos desde la predicción de pasos para no duplicar fetches del TLE.
+ */
+export async function ensureSatrec(): Promise<any> {
+  const stale = !satrec || Date.now() - tleFetchedAt > TLE_MAX_AGE_MS
+  if (stale) {
+    await fetchAndParseTle()
+  }
+  return satrec
 }
 
 /**

@@ -47,7 +47,7 @@ onMounted(async () => {
 
 <template>
   <div class="section-content">
-    <p v-if="loadingAstronauts && !hasAstronauts" class="loading-msg">Cargando astronautas...</p>
+    <p v-if="loadingAstronauts && !hasAstronauts" class="loading-msg">Cargando tripulación a bordo de la ISS…</p>
     <p v-else-if="errorAstronauts && !hasAstronauts" class="soft-error">{{ errorAstronauts }}</p>
 
     <template v-else-if="hasAstronauts">

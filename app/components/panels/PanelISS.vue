@@ -1,22 +1,22 @@
 <template>
   <aside class="panel">
     <details open class="panel-section">
-      <summary>Posición actual</summary>
+      <summary>Posición actual de la ISS</summary>
       <PanelCurrentPosition />
     </details>
 
     <details class="panel-section">
-      <summary>Astronautas a bordo</summary>
+      <summary>Astronautas a bordo ahora</summary>
       <PanelAstronauts />
     </details>
 
     <details class="panel-section">
-      <summary>Próximo paso sobre mi ubicación</summary>
+      <summary>¿Cuándo pasará la ISS por aquí?</summary>
       <PanelPassPrediction />
     </details>
 
     <details class="panel-section">
-      <summary>Directo</summary>
+      <summary>Directo de la NASA</summary>
       <PanelLive />
     </details>
     <div id="container-2361b580da27d32bb79de3389aa0d507"></div>

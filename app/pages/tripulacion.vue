@@ -3,12 +3,25 @@ import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { useIss } from '../composables/useIss'
 
 useHead({
-  title: 'Tripulación · ISS Tracker',
+  title: 'Tripulación de la ISS — Astronautas a bordo ahora mismo',
   meta: [
     {
       name: 'description',
-      content: 'Conoce a los astronautas que están actualmente a bordo de la Estación Espacial Internacional.'
-    }
+      content: 'Descubre quién está a bordo de la Estación Espacial Internacional en tiempo real: nombres, países, agencias espaciales (NASA, ESA, Roscosmos, JAXA, CSA) y perfil de cada astronauta de la tripulación actual de la ISS.'
+    },
+    {
+      name: 'keywords',
+      content: 'tripulación ISS, astronautas ISS, quién está en la ISS, astronautas a bordo Estación Espacial Internacional, tripulación actual NASA, cosmonautas ISS'
+    },
+    { property: 'og:title', content: 'Tripulación de la ISS — Astronautas a bordo ahora mismo' },
+    {
+      property: 'og:description',
+      content: 'Todos los astronautas que ocupan la Estación Espacial Internacional en este momento, con su país, agencia y rol.'
+    },
+    { property: 'og:url', content: 'https://isstrackerlive.es/tripulacion' }
+  ],
+  link: [
+    { rel: 'canonical', href: 'https://isstrackerlive.es/tripulacion' }
   ]
 })
 
@@ -137,10 +150,12 @@ watch(() => route.query.astronaut, (value) => {
   <div class="crew-page">
     <header class="crew-hero">
       <p class="eyebrow">En órbita ahora</p>
-      <h1 class="display-title">Tripulación de la ISS</h1>
+      <h1 class="display-title">Tripulación actual de la Estación Espacial Internacional</h1>
       <p class="hero-text">
-        Estos son los astronautas que se encuentran actualmente a bordo de la Estación Espacial
-        Internacional. Pulsa sobre cualquier tarjeta para ver más detalles.
+        Estos son los astronautas y cosmonautas que se encuentran ahora mismo a bordo de la ISS
+        orbitando la Tierra. Consulta su nacionalidad, agencia espacial (NASA, ESA, Roscosmos,
+        JAXA o CSA) y rol en la misión. Pulsa sobre cualquier tarjeta para ampliar la información
+        del astronauta.
       </p>
 
       <div class="crew-stats">

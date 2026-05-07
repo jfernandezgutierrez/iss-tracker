@@ -1,30 +1,12 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted } from 'vue'
+import { useNasaLive } from '../../composables/useNasaLive'
 
-interface NasaLiveItem {
-  id: string
-  videoId: string
-  title: string
-  description: string
-  status: 'live' | 'upcoming'
-  thumbnailUrl: string
-  scheduledStartTime?: string
-}
+const { items, loading, error, loadNasaLive } = useNasaLive()
 
-interface NasaLiveResponse {
-  items: NasaLiveItem[]
-  cached: boolean
-  stale?: boolean
-  fetchedAt: number
-}
-
-const items = ref<NasaLiveItem[]>([])
-const loading = ref(true)
-const errorMsg = ref<string | null>(null)
 let interval: ReturnType<typeof setInterval> | null = null
 
 const featured = computed(() => {
-  // Priorizamos un LIVE; si no hay, cogemos el primer UPCOMING para teaser.
   const live = items.value.find(i => i.status === 'live')
   if (live) return live
   return items.value[0] || null
@@ -35,21 +17,12 @@ const embedUrl = computed(() => {
   return `https://www.youtube.com/embed/${featured.value.videoId}?rel=0&modestbranding=1`
 })
 
-async function loadLive() {
-  try {
-    const data = await $fetch<NasaLiveResponse>('/api/nasa-live')
-    items.value = data.items || []
-  } catch (err: any) {
-    errorMsg.value = err?.statusMessage || err?.message || 'No se pudo cargar el directo'
-  } finally {
-    loading.value = false
-  }
-}
-
 onMounted(() => {
-  loadLive()
-  // Actualizamos cada 3 minutos para cazar cambios de estado
-  interval = setInterval(loadLive, 3 * 60 * 1000)
+  if (items.value.length === 0) {
+    loadNasaLive()
+  }
+  // Refrescamos cada 3 min para cazar cambios de estado
+  interval = setInterval(() => loadNasaLive(true), 3 * 60 * 1000)
 })
 
 onUnmounted(() => {
@@ -63,7 +36,7 @@ onUnmounted(() => {
 <template>
   <div class="section-content">
     <div v-if="loading" class="live-loading">
-      <p>Buscando directos de la NASA…</p>
+      <p>Buscando directos de la NASA y de la ISS…</p>
     </div>
 
     <template v-else>
@@ -101,19 +74,19 @@ onUnmounted(() => {
             class="badge badge-upcoming"
           >⏱ PRÓXIMO</span>
           <p class="live-title">
-            {{ featured ? featured.title : 'La NASA no tiene directos ahora mismo' }}
+            {{ featured ? featured.title : 'La NASA no tiene directos activos en este momento' }}
           </p>
         </div>
         <p class="live-subtitle">
           {{ featured && featured.status === 'live'
-            ? 'Transmitiendo en directo en YouTube'
-            : 'Canal oficial de la NASA' }}
+            ? 'Emitiendo en directo desde el canal oficial de la NASA en YouTube'
+            : 'Próxima emisión del canal oficial de la NASA' }}
         </p>
 
-        <p v-if="errorMsg" class="live-error">{{ errorMsg }}</p>
+        <p v-if="error && !featured" class="live-error">{{ error }}</p>
 
         <NuxtLink to="/directos" class="btn btn-secondary btn-block live-link">
-          Ver todos los directos →
+          Ver todos los directos de la NASA →
         </NuxtLink>
       </div>
     </template>

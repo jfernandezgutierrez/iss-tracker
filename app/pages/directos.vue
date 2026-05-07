@@ -1,36 +1,44 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import IssSpinner from '../components/layout/IssSpinner.vue'
+import { useNasaLive } from '../composables/useNasaLive'
 
-interface NasaLiveItem {
-  id: string
-  videoId: string
-  title: string
-  description: string
-  status: 'live' | 'upcoming'
-  thumbnailUrl: string
-  scheduledStartTime?: string
-  viewCountText?: string
-}
-
-interface NasaLiveResponse {
-  items: NasaLiveItem[]
-  cached: boolean
-  stale?: boolean
-  fetchedAt: number
-  error?: string
-}
+useHead({
+  title: 'Directos de la NASA — ISS, NASA TV y misiones en vivo',
+  meta: [
+    {
+      name: 'description',
+      content: 'Todos los directos oficiales de la NASA en un solo sitio: cámaras en vivo desde la ISS, NASA TV, lanzamientos, paseos espaciales y eventos programados. Detectamos automáticamente qué se está emitiendo ahora mismo en YouTube.'
+    },
+    {
+      name: 'keywords',
+      content: 'directos NASA, NASA TV en directo, ISS en vivo, cámara ISS, NASA YouTube, ver NASA en directo, lanzamientos NASA, paseos espaciales'
+    },
+    { property: 'og:title', content: 'Directos de la NASA — ISS, NASA TV y misiones en vivo' },
+    {
+      property: 'og:description',
+      content: 'Ve las emisiones en directo de la NASA y la ISS, además de los próximos lanzamientos y eventos programados.'
+    },
+    { property: 'og:url', content: 'https://isstrackerlive.es/directos' }
+  ],
+  link: [
+    { rel: 'canonical', href: 'https://isstrackerlive.es/directos' }
+  ]
+})
 
 type StatusFilter = 'all' | 'live' | 'upcoming'
 type TvSize = 'sm' | 'md'
 
-const items = ref<NasaLiveItem[]>([])
-const loading = ref(true)
-const refreshing = ref(false)
-const errorMsg = ref<string | null>(null)
-const lastFetchedAt = ref<number | null>(null)
-const staleResponse = ref(false)
+const {
+  items,
+  loading,
+  error,
+  lastFetchedAt,
+  usingFallback,
+  loadNasaLive
+} = useNasaLive()
 
+const refreshing = ref(false)
 const activeFilter = ref<StatusFilter>('all')
 const tvSize = ref<TvSize>('md')
 
@@ -55,28 +63,17 @@ const visibleStreams = computed(() => {
   return items.value.filter(i => i.status === activeFilter.value)
 })
 
-async function loadStreams(silent = false) {
-  if (silent) {
-    refreshing.value = true
-  } else {
-    loading.value = true
+const errorMsg = computed(() => {
+  if (usingFallback.value) {
+    return 'No hemos podido leer YouTube en este momento. Mostramos los directos estables de la ISS mientras tanto.'
   }
-  errorMsg.value = null
+  return error.value
+})
 
-  try {
-    const data = await $fetch<NasaLiveResponse>('/api/nasa-live')
-    items.value = data.items || []
-    lastFetchedAt.value = data.fetchedAt ?? Date.now()
-    staleResponse.value = !!data.stale
-    if (data.stale && data.error) {
-      errorMsg.value = `Mostrando la última respuesta disponible (${data.error})`
-    }
-  } catch (err: any) {
-    errorMsg.value = err?.statusMessage || err?.message || 'No se pudieron cargar los directos'
-  } finally {
-    loading.value = false
-    refreshing.value = false
-  }
+async function loadStreams(silent = false) {
+  if (silent) refreshing.value = true
+  await loadNasaLive(silent)
+  refreshing.value = false
 }
 
 function embedUrl(id: string) {
@@ -126,9 +123,11 @@ onUnmounted(() => {
   <main class="content-page directos-page">
     <header class="page-header">
       <p class="eyebrow">Transmisiones oficiales de la NASA</p>
-      <h1>Directos en tiempo real</h1>
+      <h1>Directos de la NASA y la ISS en tiempo real</h1>
       <p class="page-subtitle">
-        Detectamos automáticamente qué hay en directo y qué viene después en el canal oficial de la NASA en YouTube.
+        Mira en directo las cámaras de la Estación Espacial Internacional, NASA TV y los próximos
+        lanzamientos y eventos espaciales. Detectamos automáticamente qué se está emitiendo en vivo
+        y qué viene después en el canal oficial de la NASA en YouTube.
       </p>
 
       <div v-if="!loading" class="status-summary">
@@ -196,7 +195,7 @@ onUnmounted(() => {
       <p v-if="errorMsg && !items.length" class="error-banner">
         {{ errorMsg }}
       </p>
-      <p v-else-if="staleResponse" class="stale-banner">
+      <p v-else-if="usingFallback" class="stale-banner">
         {{ errorMsg }}
       </p>
 
@@ -275,13 +274,13 @@ onUnmounted(() => {
 
       <p v-else class="empty-state">
         <template v-if="activeFilter === 'live'">
-          No hay directos de la NASA en este momento. Prueba a mirar los próximos.
+          No hay directos de la NASA emitiéndose en este momento. Prueba a consultar los próximos directos programados.
         </template>
         <template v-else-if="activeFilter === 'upcoming'">
-          No hay directos programados a la vista.
+          No hay directos de la NASA programados a la vista. Vuelve más tarde para ver los próximos eventos.
         </template>
         <template v-else>
-          La NASA no tiene directos ni programados ahora mismo. Vuelve más tarde.
+          La NASA no tiene directos ni emisiones programadas ahora mismo. Vuelve más tarde para ver nuevas transmisiones en vivo.
         </template>
       </p>
     </template>
