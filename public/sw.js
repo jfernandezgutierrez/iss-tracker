@@ -7,7 +7,7 @@
  *  - APIs en vivo (TLE, NASA, ISS-now, who's-in-space): network-only.
  */
 
-const VERSION = 'iss-tracker-v2';
+const VERSION = 'iss-tracker-v3-games';
 const SHELL_CACHE = `shell-${VERSION}`;
 const ASSETS_CACHE = `assets-${VERSION}`;
 const TILES_CACHE = `tiles-${VERSION}`;
@@ -169,6 +169,9 @@ self.addEventListener('fetch', (event) => {
     if (request.method !== 'GET') return;
 
     const url = new URL(request.url);
+
+    // No almacenar callbacks de autenticación ni peticiones de Supabase.
+    if (url.pathname.startsWith('/juegos/cuenta') || url.hostname.endsWith('.supabase.co')) return;
 
     // APIs en vivo: nunca cacheamos (siempre fresco)
     if (isLiveApiRequest(url)) {

@@ -7,14 +7,27 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "test:games": "node scripts/test-games.mjs",
+    "test:games:browser": "node scripts/test-games-browser.mjs",
+    "test:games:integration": "node scripts/test-games-integration.mjs",
+    "typecheck": "nuxt prepare && vue-tsc --noEmit -p .nuxt/tsconfig.app.json"
   },
   "dependencies": {
+    "@supabase/supabase-js": "2.118.0",
     "leaflet": "^1.9.4",
     "nuxt": "^4.4.2",
+    "phaser": "3.90.0",
     "satellite.js": "^5.0.0",
     "suncalc": "^1.9.0",
     "vue": "^3.5.30",
     "vue-router": "^5.0.4"
+  },
+  "devDependencies": {
+    "@types/node": "22.19.0",
+    "esbuild": "0.27.4",
+    "playwright": "1.62.1",
+    "typescript": "5.9.3",
+    "vue-tsc": "3.3.1"
   }
 }

@@ -47,9 +47,9 @@ onBeforeUnmount(() => {
 
     <!-- Navegación principal: centrada en desktop, desplegable en móvil -->
     <nav
+      id="nav-menu"
       class="nav"
       :class="{ 'is-open': menuOpen }"
-      :aria-hidden="!menuOpen ? 'true' : 'false'"
       aria-label="Navegación principal"
     >
       <NuxtLink to="/" exact-active-class="router-link-active" title="Mapa en vivo de la ISS" @click="closeMenu">Mapa</NuxtLink>
@@ -57,6 +57,7 @@ onBeforeUnmount(() => {
       <NuxtLink to="/directos" title="Directos de la NASA y la ISS" @click="closeMenu">Directos</NuxtLink>
       <NuxtLink to="/historia" title="Historia y estadísticas de la ISS" @click="closeMenu">Historia</NuxtLink>
       <NuxtLink to="/galeria" title="Galería de fotos de la NASA" @click="closeMenu">Galería</NuxtLink>
+      <NuxtLink to="/juegos" title="Juegos espaciales" @click="closeMenu">Juegos</NuxtLink>
       <NuxtLink to="/contact" title="Contacto" @click="closeMenu">Contacto</NuxtLink>
       <NuxtLink to="/privacy-policy" title="Política de privacidad" @click="closeMenu">Privacidad</NuxtLink>
     </nav>
@@ -248,10 +249,12 @@ onBeforeUnmount(() => {
     opacity: 0;
     transform: translateY(-10px);
     pointer-events: none;
+    visibility: hidden;
     transition: opacity 0.25s ease, transform 0.25s ease;
   }
 
   .nav.is-open {
+    visibility: visible;
     opacity: 1;
     transform: translateY(0);
     pointer-events: auto;

@@ -1,4 +1,9 @@
 export default defineNuxtConfig({
+  runtimeConfig: {
+    gameVerificationSecret: '',
+    public: { supabaseUrl: '', supabaseKey: '', gameAdsTestMode: false, monetagZone: '' },
+  },
+
   compatibilityDate: '2026-03-31',
 
   css: [
@@ -59,12 +64,7 @@ export default defineNuxtConfig({
         { rel: 'manifest', href: '/manifest.webmanifest' }
       ],
       script: [
-        {
-          src: 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9132261570607637',
-          async: true,
-          crossorigin: 'anonymous'
-        },
-        {
+{
           type: 'application/ld+json',
           innerHTML: JSON.stringify({
             '@context': 'https://schema.org',
