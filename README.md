@@ -92,3 +92,11 @@ npm run build
 ```
 
 Pruebas de navegador: instalar Chromium con `npx playwright install chromium`, iniciar la aplicación y ejecutar `GAMES_TEST_URL=http://localhost:3000 npm run test:games:browser` (usar la sintaxis equivalente de variables de entorno en Windows). Las pruebas de integración requieren dos cuentas de ensayo y un saldo controlado, definidos en un archivo ignorado indicado por `GAMES_TEST_ACCOUNTS`. No ejecutarlas con cuentas reales.
+
+### Versión móvil: Orbital Rush
+
+ISS Runner se juega con un solo control: mantener pulsado para subir y soltar para descender. El hangar incluye tienda, misiones, récords y perfil. El servidor conserva compatibilidad con registros de plataformas anteriores y valida el nuevo modo runner-flight-v2.
+
+Migración adicional: `supabase/migrations/20261102072406_runner_mobile_missions.sql`. El cliente, el servidor y la base de datos deben usar la versión correspondiente. Las misiones de cuenta solo avanzan tras validar el vuelo; las medallas de invitado se guardan en el dispositivo y no conceden monedas en la nube.
+
+Las pruebas de integración admiten `GAMES_TEST_MODE=flight` para comprobar la nueva sesión, repetición de controles, clasificación y progreso de misiones. `tests/flight-security.sql` verifica las políticas y los triggers con fixtures dentro de una transacción que se revierte.

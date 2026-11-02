@@ -19,15 +19,15 @@ export interface PortalGame {
 
 export const games: PortalGame[] = [
   {
-    slug: 'iss-runner', title: 'ISS Runner', category: 'Plataformas',
-    description: 'Una aventura de plataformas entre estaciones orbitales, monedas y desafíos espaciales.',
-    fullDescription: 'Ponte el traje de astronauta y explora una sucesión de plataformas orbitales. Decide cuándo avanzar, retroceder o saltar mientras buscas monedas y cápsulas de oxígeno. El recorrido aumenta su dificultad a medida que progreses.',
-    objective: 'Llega lo más lejos posible sin caer, agotar el oxígeno ni sucumbir a los peligros del recorrido.',
-    pcControls: ['Flechas izquierda y derecha o A / D: desplazarte libremente.', 'Espacio o flecha arriba: saltar.', 'Escape: pausar o reanudar la partida.'],
-    mobileControls: ['Botones táctiles de izquierda y derecha: desplazarte.', 'Botón de salto: superar huecos y obstáculos.', 'Botón de pausa: detener o reanudar la partida.'],
-    mechanics: ['Movimiento lateral libre, sin avance automático en la primera versión.', 'Plataformas, obstáculos y enemigos en segmentos generados progresivamente.', 'Monedas coleccionables y oxígeno limitado con cápsulas de recarga.', 'Fin de partida al caer, perder la salud o agotar el oxígeno; reinicio desde el comienzo.'],
-    scoring: ['La puntuación combinará distancia máxima alcanzada y monedas recogidas.', 'Retroceder y volver a recorrer el mismo tramo no deberá duplicar los puntos de distancia.', 'Obtienes un punto por metro y diez puntos por moneda. Cada nivel de multiplicador añade una moneda por recogida.', 'Con una cuenta, el servidor reproduce tus controles antes de guardar el resultado y las monedas. Las partidas duran como máximo diez minutos.'],
-    image: '/games/iss-runner.svg', imageAlt: 'Ilustración conceptual de un astronauta sobre plataformas orbitales',
+    slug: 'iss-runner', title: 'ISS Runner', category: 'Vuelo arcade',
+    description: 'Despega con un solo dedo, esquiva rayos de energía y conquista la estación orbital.',
+    fullDescription: 'Pilota un traje orbital con mochila propulsora en una estación en movimiento. El avance es automático: mantén pulsado para ganar altura y suelta para descender. Regresa al hangar para mejorar tu equipo y completar misiones.',
+    objective: 'Llega lo más lejos posible, cruza los espacios entre emisores de energía y recoge monedas y oxígeno.',
+    pcControls: ['Mantén espacio, W o flecha arriba para activar el propulsor.', 'Suelta la tecla para descender. El avance es automático.', 'Escape: pausar o reanudar.'],
+    mobileControls: ['Mantén pulsada la zona de vuelo o el botón inferior para subir.', 'Suelta para descender.', 'Pulsa pausa para visitar tienda, misiones o perfil sin abandonar el juego.'],
+    mechanics: ['Vuelo de un solo control y avance automático.', 'Emisores de energía con pasillos transitables y dificultad progresiva.', 'Monedas, oxígeno, escudo y seis mejoras para el siguiente vuelo.', 'Misiones y récords separados del antiguo modo de plataformas.'],
+    scoring: ['Un punto por metro y diez por moneda.', 'Las mejoras de monedas se aplican a las recogidas de la partida.', 'Con una cuenta, el servidor reproduce el vuelo antes de guardar monedas, récord y misiones.', 'Las misiones conceden medallas sin monedas adicionales; el progreso invitado es local.'],
+    image: '/games/runner/flight-cover.png', imageAlt: 'ISS Runner Orbital Rush: astronauta original con mochila propulsora en el hangar',
     status: 'available', featured: true, route: '/juegos/iss-runner', previewRoute: '/juegos/iss-runner',
   },
   {

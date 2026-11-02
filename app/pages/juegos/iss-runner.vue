@@ -1,35 +1,22 @@
 <script setup lang="ts">
 import { games } from '../../data/games'
-import GameDetails from '../../components/games/GameDetails.vue'
-import GameShop from '../../components/games/GameShop.vue'
-import GameLeaderboard from '../../components/games/GameLeaderboard.vue'
-import PlayerSummary from '../../components/games/PlayerSummary.vue'
-import GameAdSlot from '../../components/games/GameAdSlot.vue'
-definePageMeta({ layout: 'games' })
-const game = games.find(game => game.slug === 'iss-runner')!
-useHead({
-  title: 'ISS Runner — Juego espacial de plataformas',
-  meta: [
-    { name: 'description', content: 'Juega gratis a ISS Runner: salta entre plataformas orbitales, esquiva peligros, recoge monedas y vigila tu oxígeno. Compatible con teclado y móvil.' },
-    { property: 'og:title', content: 'ISS Runner · ISS Tracker' },
-    { property: 'og:description', content: game.description },
-    { property: 'og:url', content: 'https://isstrackerlive.es/juegos/iss-runner' },
-    { name: 'twitter:title', content: 'ISS Runner · ISS Tracker' },
-    { name: 'twitter:description', content: game.description },
-  ],
-  link: [{ rel: 'canonical', href: 'https://isstrackerlive.es/juegos/iss-runner' }],
-})
+definePageMeta({layout:'games'})
+const game=games.find(game=>game.slug==='iss-runner')!
+useHead({title:'ISS Runner — Orbital Rush',meta:[
+ {name:'description',content:'Vuela con un solo dedo en ISS Runner: mantén pulsado para activar el propulsor, esquiva rayos y completa misiones. Tienda y récords dentro del juego.'},
+ {property:'og:title',content:'ISS Runner · Orbital Rush'},
+ {property:'og:description',content:game.description},
+ {property:'og:url',content:'https://isstrackerlive.es/juegos/iss-runner'},
+],link:[{rel:'canonical',href:'https://isstrackerlive.es/juegos/iss-runner'}]})
 </script>
 <template>
-  <main class="container mission-page stack-lg">
-    <NuxtLink to="/juegos">← Volver al catálogo de juegos</NuxtLink>
-    <section class="stack" aria-labelledby="mission-title"><div class="row"><span class="badge">Plataformas</span><span class="badge badge-success">Disponible · Primera versión</span></div><h1 id="mission-title" class="display-title">ISS Runner</h1><p>{{ game.description }}</p></section>
-    <PlayerSummary />
-    <ClientOnly><GamesRunnerGame /><template #fallback><section class="panel-card"><p>El juego se carga en tu navegador. Puedes consultar las instrucciones a continuación.</p></section></template></ClientOnly>
-    <GameAdSlot placement="game-info" />
-    <section class="panel-card stack-lg" aria-labelledby="briefing-title"><h2 id="briefing-title" class="section-title">Antes de despegar</h2><GameDetails :game="game" /></section>
-    <GameShop /><GameLeaderboard />
-    <p class="text-soft">Gráficos pixel art originales de la primera versión. Puedes jugar como invitado; para guardar monedas y progresión inicia sesión antes de comenzar.</p>
-  </main>
+ <main class="flight-page">
+  <h1 class="sr-only">ISS Runner · Orbital Rush</h1>
+  <ClientOnly><GamesRunnerGame/><template #fallback><section class="flight-fallback"><h2>Preparando el hangar</h2><p>Vuela con un solo dedo: mantén pulsado para subir, suelta para bajar y esquiva los emisores de energía. Recoge monedas y completa misiones.</p><NuxtLink to="/juegos">Volver al catálogo</NuxtLink></section></template></ClientOnly>
+ </main>
 </template>
-<style scoped>.mission-page { max-width: 1200px; padding-top: 32px; padding-bottom: 48px; }</style>
+<style scoped>
+.flight-page{width:100%;max-width:1180px;height:100dvh;min-height:420px;margin:0 auto;padding:16px}.flight-fallback{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:32px;text-align:center;background:#0c1d2e;border-radius:24px}.flight-fallback p{max-width:480px;color:var(--text-soft)}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media(max-width:600px){.flight-page{padding:0;min-height:0}.flight-page :deep(.runner-shell){border:0;border-radius:0;min-height:0}}
+@media(max-height:600px)and(min-width:600px){.flight-page{padding:0;min-height:0}.flight-page :deep(.runner-shell){border-radius:0}}
+</style>

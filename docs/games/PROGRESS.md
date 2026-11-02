@@ -53,3 +53,29 @@ Actualizado: 2026-10-30. El usuario autorizó continuar todas las fases y subir 
 - public/games y scripts/generate-game-assets.py: recursos originales y generador.
 - tests/games.test.ts, scripts/test-games*.mjs: pruebas reproducibles.
 - docs/games: plan, progreso, arquitectura, recursos, monetización y despliegue.
+
+## Actualización móvil — 2026-11-02
+
+Petición del usuario: experiencia centrada en móvil, tienda y misiones dentro del juego, con ritmo de arcade de propulsor como referencia y recursos originales.
+
+### Implementación
+- Nuevo modo predeterminado **Orbital Rush**: avance automático y un solo control (mantener para subir / soltar para descender). Teclado equivalente: espacio, W o flecha arriba.
+- Hangar integrado con navegación inferior: Hangar, Misiones, Tienda, Récords y Perfil. Las compras, las instrucciones, el acceso a la cuenta, el sonido y las preferencias están dentro de la misma pantalla.
+- Vista vertical que ocupa el alto útil del móvil, con áreas seguras; diseño alternativo al girar a horizontal. Pantalla completa opcional y sin scroll de la página durante el vuelo. Los paneles tienen su propio scroll.
+- Pausa antes de visitar la tienda. Las mejoras se aplican al siguiente vuelo. Se conserva el reintento de guardado y se impide descartar un resultado pendiente accidentalmente al reiniciar.
+- Piloto con mochila propulsora: 16 frames de 48×48, dos animaciones; nuevos emisores animados, hangar y portada originales. Recursos de plataformas anteriores conservados para compatibilidad.
+- Tres misiones: 100 m en un vuelo, 20 monedas acumuladas, 3 vuelos. Con cuenta, progreso calculado en la base de datos solo tras un resultado verificado; invitado, medallas locales en el dispositivo. No hay monedas adicionales por misiones.
+- Clasificación de vuelo separada por rules_version. El servidor admite los registros antiguos runner-v1 y el nuevo runner-flight-v2; el cliente no puede seleccionar la versión de una sesión existente.
+- Migración 20261102072406_runner_mobile_missions.sql aplicada: inicio de vuelo versionado, tabla player_missions con RLS, asignación del modo de puntuación y actualización atómica de misiones.
+
+### Comprobaciones
+- Diez pruebas automáticas de reglas (seis anteriores y cuatro de vuelo): control automático, mantener/soltar, repetición exacta, rechazo de datos falsos, corredores transitables con un controlador de un botón, mejoras y misiones.
+- 20 semillas × 6000 pasos de vuelo: navegación entre emisores sin daño con un controlador de prueba; objetos y memoria acotados.
+- SQL transaccional en Supabase: modo de sesión correcto, misiones actualizadas desde resultados verificados, resultado duplicado sin duplicar misión y RLS aislando cuentas. Fixtures revertidos.
+- Playwright: móvil 390×844, 360×640, horizontal 844×390 y escritorio 1440×1000. Hangar, navegación interna, tienda con scroll propio, vuelo táctil, pausa/tienda/reanudación, teclado, resultado, medallas locales tras recargar y destrucción al salir.
+- Revisión visual de capturas de hangar, tienda, vuelo, misiones y orientaciones.
+- Sin nuevas dependencias ni cambios de precio o saldo gratuitos.
+
+### Despliegue
+El código requiere desplegar cliente y servidor juntos para que el modo nuevo se valide. La migración remota es aditiva y conserva la compatibilidad con el modo previo. La publicación en Hostinger sigue siendo un paso independiente del envío a GitHub.
+- Integración real del modo de vuelo completada: acceso con dos cuentas desechables, inicio versionado, repetición del vuelo en servidor, guardado de la clasificación con runner-flight-v2 y misión contabilizada una sola vez pese a reintentos. Lectura cruzada y edición directa de misiones rechazadas.

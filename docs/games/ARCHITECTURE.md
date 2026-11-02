@@ -39,3 +39,14 @@ Adaptador independiente, desactivado por defecto; no hay scripts Monetag ni reco
 Pruebas unitarias, navegador escritorio/móvil y pruebas de integración reales en Supabase. Las dos cuentas de ensayo se eliminaron junto con sus datos. La compilación pasa. El chequeo global de tipos encuentra problemas previos de mapa, galería y predicción de pases; el código nuevo de juegos no produce errores propios en el chequeo.
 
 Registro y recuperación tienen UI e integración implementadas. La entrega efectiva de correos y los enlaces en producción requieren configurar SMTP, Site URL y destinos permitidos en Supabase y comprobarlos con un buzón real. No se han enviado correos de prueba a personas.
+
+## Evolución móvil — 2026-11-02 (comportamiento actual)
+La ruta /juegos/iss-runner usa ahora Orbital Rush. Los apartados anteriores sobre plataformas documentan runner-v1, conservado en el código y en el validador para no romper registros previos. La instrucción posterior del usuario reemplaza la preferencia inicial de desplazamiento libre en la interfaz predeterminada.
+
+La física de vuelo determinista está en shared/games/flight.ts. Usa avance automático, aceleración por propulsor mantenido, límite de velocidad vertical, suelo y techo seguros, emisores de energía con aberturas y dificultad gradual. La escena createFlightGame.ts adapta el ancho lógico al tamaño real del panel con ResizeObserver, manteniendo la misma altura física. La relación de aspecto modifica el encuadre, no la simulación ni los resultados. Los objetos visuales y las partículas siguen limitados por pools; se desconecta el observador al destruir el juego.
+
+RunnerGame.client.vue aloja todos los paneles y controles. No se monta una tienda ni clasificación debajo del canvas. Los paneles son vistas de la pantalla del juego con scroll interno; visitar uno pausa el vuelo. El hangar usa una ilustración vectorial y una vista previa del piloto sin cargar Phaser. Al comenzar se importan motor y escena de vuelo; los sprites no se descargan desde la web principal.
+
+Las misiones son medallas, sin recompensa monetaria añadida. El invitado usa una clave local independiente iss-flight-guest-missions; el progreso de una cuenta nunca se toma de ese almacenamiento. player_missions solo admite SELECT del propietario desde cliente. El trigger privado record_flight_missions se ejecuta en la transacción del resultado verificado, impidiendo progreso doble al reintentar. El modo de cada puntuación se deriva de su sesión protegida y permite filtrar la clasificación sin exponer semillas o loadouts de otros usuarios.
+
+La mejora double-jump conserva su identificador de compra, niveles y precio; en vuelo se presenta como Impulso reforzado y añade empuje vertical. El rescate de emergencia absorbe una derrota por impacto una vez por vuelo. El modo de plataformas previo conserva sus efectos originales. Las mejoras se capturan al comenzar: una compra durante la pausa no altera la partida actual.

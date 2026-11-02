@@ -27,19 +27,23 @@ assert.ok(purchases.every(result => !result.error))
 const after = (await a.from('wallets').select('currency_balance').single()).data.currency_balance
 assert.equal(after, before - 50, 'duplicate purchases must charge only once')
 assert.ok((await a.rpc('purchase_game_upgrade', { p_key: 'oxygen', p_request: request })).error)
-const { data: run, error } = await a.rpc('start_game_run')
+const isFlight = process.env.GAMES_TEST_MODE === 'flight'
+const { data: run, error } = await a.rpc(isFlight ? 'start_flight_run' : 'start_game_run')
 assert.equal(error, null)
 assert.equal(run.loadout.shield, 1)
 assert.equal((await b.from('game_sessions').select('*').eq('id', run.id)).data.length, 0)
 assert.ok((await a.rpc('finish_game_run', { p_run: run.id, p_score: 10, p_coins: 1, p_distance: 0, p_ticks: 1, p_proof: 'forged' })).error)
-await build({ entryPoints: ['shared/games/runner.ts'], outfile: '.cache/runner-core.mjs', bundle: true, platform: 'node', format: 'esm' })
-const { createRunner, stepRunner, runnerResult } = await import('../.cache/runner-core.mjs')
+await build({ entryPoints: [isFlight ? 'shared/games/flight.ts' : 'shared/games/runner.ts'], outfile: '.cache/runner-core.mjs', bundle: true, platform: 'node', format: 'esm' })
+const core = await import('../.cache/runner-core.mjs')
+const createRunner = isFlight ? core.createFlight : core.createRunner
+const stepRunner = isFlight ? (state) => core.stepFlight(state, false) : core.stepRunner
+const runnerResult = isFlight ? core.flightResult : core.runnerResult
 const state = createRunner(run.seed, run.loadout)
 while (!state.dead) stepRunner(state, { direction: 1, jump: false })
-const payload = { runId: run.id, ticks: state.tick, events: [{ tick: 0, direction: 1, jump: false }] }
+const payload = { runId: run.id, ticks: state.tick, events: isFlight ? [] : [{ tick: 0, direction: 1, jump: false }] }
 const tokenA = (await a.auth.getSession()).data.session.access_token
 const tokenB = (await b.auth.getSession()).data.session.access_token
-const base = process.env.GAMES_TEST_URL || 'http://localhost:3103'
+const base = process.env.GAMES_TEST_URL || 'http://localhost:3110'
 const call = (body, token) => fetch(`${base}/api/games/finish`, { method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) }, body: JSON.stringify(body) })
 assert.equal((await call(payload)).status, 401)
 assert.equal((await call(payload, tokenB)).status, 404)
@@ -56,5 +60,13 @@ const final = (await a.from('wallets').select('currency_balance').single()).data
 assert.equal(final, after + state.coins)
 const transactions = (await a.from('wallet_transactions').select('*').eq('request_id', run.id)).data
 assert.equal(transactions.length, 1)
+if (isFlight) {
+ const missions = await a.from('player_missions').select('*')
+ assert.equal(missions.error, null)
+ assert.equal(missions.data.find(row => row.mission_key === 'flights').progress, 1)
+ assert.equal((await b.from('player_missions').select('*').eq('user_id', fixture.userA)).data.length, 0)
+ assert.ok((await a.from('player_missions').update({ progress: 9999 }).eq('user_id', fixture.userA)).error)
+ assert.equal((await a.from('game_scores').select('rules_version').eq('session_id', run.id).single()).data.rules_version, 'runner-flight-v2')
+}
 await a.auth.signOut(); await b.auth.signOut()
 console.log('Supabase integration passed: real login, RLS isolation, mutation denial, replay validation, concurrent purchase and reward idempotency, sign-out.')

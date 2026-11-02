@@ -77,3 +77,47 @@ test('ad adapter cannot load live ads, reward play or interrupt a mission', asyn
   assert.equal((await ads.request('catalog', true)).state, 'test')
   assert.equal((await ads.request('results', true)).state, 'frequency-limited')
 })
+
+import { createFlight, stepFlight, flightResult, replayFlight, flightChunk, FLIGHT } from '../shared/games/flight'
+import { advanceMissions } from '../shared/games/missions'
+test('mobile flight advances automatically and hold/release changes altitude',()=>{
+ const flight=createFlight(42);const initialX=flight.x
+ for(let i=0;i<30;i++)stepFlight(flight,true)
+ assert.ok(flight.x>initialX);assert.ok(flight.y<350)
+ const high=flight.y
+ for(let i=0;i<100;i++)stepFlight(flight,false)
+ assert.ok(flight.y>high);assert.ok(flight.y<=FLIGHT.floor)
+})
+test('mobile replay derives results and rejects tampering and unfinished flights',()=>{
+ const flight=createFlight(123)
+ while(!flight.dead)stepFlight(flight,false)
+ assert.deepEqual(replayFlight(123,{},[],flight.tick),flightResult(flight))
+ assert.throws(()=>replayFlight(123,{},[],flight.tick+1))
+ assert.throws(()=>replayFlight(123,{},[],10))
+ assert.throws(()=>replayFlight(123,{},[{tick:0,direction:-1,jump:true}],flight.tick))
+ assert.throws(()=>replayFlight(123,{},[{tick:0,direction:1,jump:'yes' as any}],flight.tick))
+})
+test('mobile corridors can be traversed by a bounded one-button controller',()=>{
+ for(let seed=0;seed<20;seed++){
+  const flight=createFlight(seed)
+  for(let tick=0;tick<6000;tick++){
+   flight.oxygen=55
+   const gate=flight.chunks.find(chunk=>chunk.gate.x>flight.x-30)!.gate
+   stepFlight(flight,flight.y+flight.vy*.35>gate.center)
+   assert.equal(flight.health,3,`seed ${seed},tick ${tick}`)
+   assert.equal(flight.dead,false)
+   assert.ok(flight.chunks.length<=6)
+   assert.ok(flight.collected.size<=54)
+  }
+ }
+})
+test('flight upgrades, mission progress and rescue have actual effects',()=>{
+ const normal=createFlight(42);const reinforced=createFlight(42,{'double-jump':1})
+ for(let i=0;i<20;i++){stepFlight(normal,true);stepFlight(reinforced,true)}
+ assert.ok(reinforced.y<normal.y)
+ const rescue=createFlight(42,{thruster:1});rescue.x=flightChunk(42,0).gate.x-4;rescue.y=600;rescue.health=1
+ stepFlight(rescue,false);assert.equal(rescue.health,1);assert.equal(rescue.rescue,false);assert.equal(rescue.dead,false)
+ const progress=advanceMissions({distance:80,coins:18,flights:2},{distance:120,coins:4})
+ assert.deepEqual(progress,{distance:120,coins:20,flights:3})
+ assert.deepEqual(advanceMissions(progress,{distance:60,coins:2}),progress)
+})

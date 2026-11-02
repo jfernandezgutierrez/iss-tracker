@@ -23,3 +23,17 @@ Idle: 4; correr: 8; saltar: 2; caer: 2; daño: 3; morir: 6; celebración: 4. Fon
 `public/games/iss-runner.svg`, `meteor-dodge.svg`, `iss-docking.svg`: viewBox 800 × 450. Son ilustraciones conceptuales provisionales, no capturas del juego.
 
 El arte jugable es funcional y original; admite una posterior pasada artística. No se presenta como arte de producción de terceros ni como material generado a partir de referencias protegidas.
+
+## Arte móvil — 2026-11-02
+
+Nuevo arte propio, generado de forma reproducible por el mismo generador, sin reutilizar personajes, logotipos ni recursos de Jetpack Joyride.
+
+| Archivo en public/games/runner | Dimensiones | Uso |
+|---|---|---|
+| flight-pilot.png | 768×48 | 16 frames de 48×48: 8 de vuelo libre y 8 con propulsor |
+| flight-pilot-preview.png | 192×192 | Vista previa del piloto en hangar, ampliación nearest-neighbor |
+| flight-hazards.png | 192×144 | Tres tipos de emisor, cuatro frames de 48×48 por tipo |
+| hangar.svg | viewBox 960×1000 | Hangar vectorial original, adaptable a vertical y horizontal |
+| flight-cover.png | 960×540 | Portada del catálogo, compuesta con los sprites originales |
+
+Los pasillos con ventanas, paneles, rayos, suelo y techo se dibujan con gráficos Phaser reutilizados. Los iconos de navegación, tienda y misiones son trazos SVG propios en GameIcon.vue. Los recursos runner-v1 se mantienen, pero no se cargan al jugar al modo de vuelo.

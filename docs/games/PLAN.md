@@ -397,3 +397,6 @@ Implementar el diálogo informativo reutilizable y preparar la navegación hacia
 No conectar todavía Supabase, Monetag ni crear el videojuego completo.
 
 Al finalizar, presentar resumen de cambios, comprobaciones y siguientes pasos.
+
+## Evolución aprobada — 2026-11-02
+El usuario pide centrar ISS Runner en móvil, con control de propulsor mantenido, avance automático, sprites mejorados y tienda, misiones y menús dentro del juego. Esta petición posterior sustituye la preferencia inicial de movimiento lateral libre para el modo predeterminado. Se conserva runner-v1 para compatibilidad de validación; Orbital Rush utiliza runner-flight-v2. Ver PROGRESS.md y ARCHITECTURE.md para decisiones y pruebas actuales.

@@ -1,13 +1,16 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+const route=useRoute()
+const flightPage=computed(()=>route.path.replace(/\/$/,'')==='/juegos/iss-runner')
 import GamePrivacy from '../components/games/GamePrivacy.vue'
 </script>
 <template>
   <div class="games-layout">
-    <header class="portal-header container">
+    <header v-if="!flightPage" class="portal-header container">
       <NuxtLink class="portal-brand" to="/juegos">ISS Tracker <span class="badge">Games</span></NuxtLink>
       <NuxtLink class="btn btn-secondary" to="/">← Volver a ISS Tracker</NuxtLink>
     </header>
-    <slot /><footer class="container portal-footer"><GamePrivacy /></footer>
+    <slot /><footer v-if="!flightPage" class="container portal-footer"><GamePrivacy /></footer>
   </div>
 </template>
 

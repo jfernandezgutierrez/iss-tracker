@@ -7,7 +7,7 @@
  *  - APIs en vivo (TLE, NASA, ISS-now, who's-in-space): network-only.
  */
 
-const VERSION = 'iss-tracker-v3-games';
+const VERSION = 'iss-tracker-v4-flight';
 const SHELL_CACHE = `shell-${VERSION}`;
 const ASSETS_CACHE = `assets-${VERSION}`;
 const TILES_CACHE = `tiles-${VERSION}`;

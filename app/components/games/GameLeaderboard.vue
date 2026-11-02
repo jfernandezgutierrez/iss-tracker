@@ -9,7 +9,7 @@ async function load() {
     await account.init()
     const client = account.getClient()
     if (!client) return
-    const { data, error } = await client.from('game_scores').select('id,score,distance,profiles(username),games!inner(slug)').eq('games.slug', 'iss-runner').eq('verification_status', 'replayed').order('score', { ascending: false }).order('created_at', { ascending: true }).limit(10)
+    const { data, error } = await client.from('game_scores').select('id,score,distance,profiles(username),games!inner(slug)').eq('games.slug', 'iss-runner').eq('rules_version', 'runner-flight-v2').eq('verification_status', 'replayed').order('score', { ascending: false }).order('created_at', { ascending: true }).limit(10)
     if (error) throw error
     rows.value = data as any
   } catch { errorMessage.value = 'No se pudo cargar la clasificación.' }

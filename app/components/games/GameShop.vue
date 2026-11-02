@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
+import GameIcon from './GameIcon.vue'
 import { upgradeCatalog } from '#shared/games/config'
 const account = useGameAccount()
 const busy = ref('')
@@ -21,12 +22,12 @@ async function buy(key: string) {
 </script>
 <template>
   <section class="stack-lg" aria-labelledby="shop-title">
-    <div><h2 id="shop-title" class="section-title">Tienda de la misión</h2><p class="section-subtitle">Usa las monedas ganadas jugando. Los precios aumentan con cada nivel.</p></div>
+    <div><h2 id="shop-title" class="section-title">Arsenal del hangar</h2><p class="section-subtitle">Equipa tu siguiente vuelo. Las mejoras compradas durante una pausa se aplican a la próxima partida.</p></div>
     <p v-if="!account.session.value" class="text-soft">Inicia sesión para comprar y conservar mejoras. Las partidas de invitado no generan saldo en la nube.</p>
     <p v-else>Saldo: <strong>{{ account.balance.value }} monedas</strong></p>
     <div class="shop-grid">
       <article v-for="upgrade in upgradeCatalog" :key="upgrade.key" class="glass-card stack">
-        <h3>{{ upgrade.name }}</h3><p class="text-soft">{{ upgrade.description }}</p>
+        <div class="upgrade-heading"><span class="upgrade-icon"><GameIcon :name="upgrade.key === 'shield' ? 'shield' : upgrade.key === 'oxygen' ? 'orbit' : upgrade.key === 'multiplier' || upgrade.key === 'magnet' ? 'coin' : 'rocket'" /></span><h3>{{ upgrade.name }}</h3></div><p class="text-soft">{{ upgrade.description }}</p>
         <span>Nivel {{ account.levels.value[upgrade.key] || 0 }} / {{ upgrade.maxLevel }}</span>
         <button class="btn btn-secondary" :disabled="!account.session.value || !!busy || (account.levels.value[upgrade.key] || 0) >= upgrade.maxLevel || account.balance.value < upgrade.price * ((account.levels.value[upgrade.key] || 0) + 1)" @click="buy(upgrade.key)">{{ (account.levels.value[upgrade.key] || 0) >= upgrade.maxLevel ? 'Al máximo' : busy === upgrade.key ? 'Comprando…' : `${upgrade.price * ((account.levels.value[upgrade.key] || 0) + 1)} monedas · Comprar` }}</button>
       </article>
@@ -34,4 +35,4 @@ async function buy(key: string) {
     <p v-if="message" role="status">{{ message }}</p>
   </section>
 </template>
-<style scoped>.shop-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 16px; }.shop-grid article p { flex: 1; }</style>
+<style scoped>.upgrade-heading{display:flex;align-items:center;gap:12px}.upgrade-icon{display:inline-flex;padding:10px;border-radius:12px;background:#244756;color:#8be4ce}.shop-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 16px; }.shop-grid article p { flex: 1; }</style>
