@@ -1,5 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
+import { decodePending, pendingKey, PENDING_TTL } from '../shared/games/pending'
+import { dockingReadiness, finiteProgress } from '../shared/games/presentation'
 import { createRunner, stepRunner, runnerResult, replayRunner, segmentFor, platformY } from '../shared/games/runner'
 import { WORLD, MAX_TICKS } from '../shared/games/config'
 import { GameAds } from '../shared/games/ads'
@@ -180,4 +182,45 @@ test('generated sprite packs have alpha, valid non-overlapping frames and bounde
    for(let j=i+1;j<frames.length;j++){const b=frames[j];assert.ok(a.x+a.width<=b.x||b.x+b.width<=a.x||a.y+a.height<=b.y||b.y+b.height<=a.y,'Frames must not overlap')}
   }
  }
+})
+
+
+test('pending results recover only for their owner and before the server session expires', () => {
+  const userId = '10000000-0000-4000-8000-000000000001'
+  const otherId = '10000000-0000-4000-8000-000000000002'
+  const run = { runId: '20000000-0000-4000-8000-000000000001', userId, startedAt: 1000, ticks: 60, events: [{tick:0,x:0,y:1,boost:false}] }
+  const raw = JSON.stringify(run)
+  assert.deepEqual(decodePending(raw, 'iss-docking', userId, 2000), run)
+  assert.equal(decodePending(raw, 'iss-docking', otherId, 2000), null)
+  assert.equal(decodePending(raw, 'iss-docking', userId, 1000 + PENDING_TTL), null)
+  assert.notEqual(pendingKey('iss-docking', userId), pendingKey('iss-docking', otherId))
+  assert.notEqual(pendingKey('iss-docking', userId), pendingKey('meteor-dodge', userId))
+})
+
+test('recovery rejects corrupt, oversized and nonreplayable input without trusting local scores', () => {
+  const userId = '10000000-0000-4000-8000-000000000001'
+  const run = { runId:'20000000-0000-4000-8000-000000000001', userId, startedAt:1000, ticks:60, events:[] }
+  const decode = (value:unknown) => decodePending(JSON.stringify(value), 'meteor-dodge', userId, 2000)
+  for (const value of [null, {}, {...run,ticks:10801}, {...run,startedAt:3000}, {...run,runId:'fake'}, {...run,events:[{tick:60,x:0,y:0,boost:false}]}, {...run,events:[{tick:0,x:2,y:0,boost:false}]}, {...run,events:[{tick:1,x:0,y:0,boost:false},{tick:1,x:0,y:0,boost:false}]}]) assert.equal(decode(value),null)
+  assert.equal(decodePending('{', 'meteor-dodge', userId, 2000),null)
+  assert.equal(decodePending(' '.repeat(2500001), 'meteor-dodge', userId, 2000),null)
+  assert.equal((decode({...run,coins:999999,access_token:'not-persisted'}) as any)?.access_token,undefined)
+  assert.ok(decodePending(JSON.stringify({...run,events:[{tick:0,direction:1,jump:true}]}), 'iss-runner', userId, 2000))
+  assert.equal(decodePending(JSON.stringify({...run,events:[{tick:0,direction:1,jump:true}]}), 'iss-docking', userId, 2000),null)
+})
+
+test('docking indicators match actual contact success across all maps and boundary values', () => {
+  for(let mapIndex=0;mapIndex<3;mapIndex++) for(const x of [0,8,10,12,12.01]) for(const vx of [0,5.99,6,-6]) for(const approach of [.65,.651]) {
+    const state=createArcade('iss-docking',42,{map_index:mapIndex})
+    Object.assign(state,{x,y:0,vx,vy:0,approach,range:.000001})
+    stepArcade(state,{x:0,y:0,boost:false})
+    const check=dockingReadiness(state)
+    assert.equal(state.success,check.aligned&&check.steady&&check.slow)
+  }
+})
+
+test('invalid local progress cannot produce infinite balances or unlock every destination', () => {
+  for(const value of [Infinity,-Infinity,NaN,'Infinity',true,{},null,undefined,-30]) assert.equal(finiteProgress(value),0)
+  assert.equal(finiteProgress('35.9'),35)
+  assert.equal(finiteProgress(999999999),1000000)
 })

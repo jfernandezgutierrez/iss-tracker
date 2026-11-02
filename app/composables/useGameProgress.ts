@@ -1,6 +1,7 @@
 import { ref, computed, watch } from 'vue'
 import { worldMaps, arcadeUpgrades, advanceArcadeMissions, type GameSlug } from '#shared/games/progression'
 import { upgradeCatalog } from '#shared/games/config'
+import { finiteProgress } from '#shared/games/presentation'
 interface GuestProgress {coins:number;levels:Record<string,number>;missions:Record<string,number>;bestScore:number;bestDistance:number;seen:string[]}
 function empty():GuestProgress{return{coins:0,levels:{},missions:{},bestScore:0,bestDistance:0,seen:[]}}
 export function useGameProgress(game:GameSlug){
@@ -17,7 +18,7 @@ export function useGameProgress(game:GameSlug){
  const equipment=computed(()=>account.session.value?account.levels.value:guest.value.levels)
  const objectiveProgress=computed(()=>account.session.value?missions.value:guest.value.missions)
  const activeMap=computed(()=>mapList.find(map=>map.key===selected.value) || mapList[0]!)
- function readGuest(){try{const raw=JSON.parse(localStorage.getItem(`iss-progress-${game}-v1`)||'{}');const number=(v:unknown)=>Math.max(0,Math.min(1000000,Math.floor(Number(v)||0)));return{coins:number(raw.coins),bestScore:number(raw.bestScore),bestDistance:number(raw.bestDistance||(game==='iss-runner'?localStorage.getItem('iss-flight-best'):0)),levels:Object.fromEntries(catalog.map(item=>[item.key,Math.min(item.maxLevel,number(raw.levels?.[item.key]))])),missions:Object.fromEntries(['score','coins','plays'].map(key=>[key,number(raw.missions?.[key])])),seen:Array.isArray(raw.seen)?raw.seen.filter((id:unknown)=>typeof id==='string').slice(-20):[]} as GuestProgress}catch{return empty()}}
+ function readGuest(){try{const raw=JSON.parse(localStorage.getItem(`iss-progress-${game}-v1`)||'{}')||{};const number=finiteProgress;return{coins:number(raw.coins),bestScore:number(raw.bestScore),bestDistance:number(raw.bestDistance||(game==='iss-runner'?localStorage.getItem('iss-flight-best'):0)),levels:Object.fromEntries(catalog.map(item=>[item.key,Math.min(item.maxLevel,number(raw.levels?.[item.key]))])),missions:Object.fromEntries(['score','coins','plays'].map(key=>[key,number(raw.missions?.[key])])),seen:Array.isArray(raw.seen)?raw.seen.filter((id:unknown)=>typeof id==='string').slice(-20):[]} as GuestProgress}catch{return{...guest.value,levels:{...guest.value.levels},missions:{...guest.value.missions},seen:[...guest.value.seen]}}}
  function storeGuest(value:GuestProgress){localStorage.setItem(`iss-progress-${game}-v1`,JSON.stringify(value));guest.value=value}
  async function refresh(){
   error.value=''
@@ -35,7 +36,7 @@ export function useGameProgress(game:GameSlug){
    cloudBest.value=Number((results.data?.[0] as any)?.[metric]||0);missions.value=objectiveData
   }catch{error.value='No se pudo cargar la progresión de tu cuenta. Reintenta antes de elegir un mapa nuevo.'}
  }
- async function init(){if(!import.meta.client)return;guest.value=readGuest();await account.init();await refresh();try{const key=localStorage.getItem(`iss-map-choice-${game}-${account.session.value?.user.id||'guest'}`);const stored=mapList.find(map=>map.key===key);if(stored&&stored.unlock<=best.value)selected.value=stored.key}catch{}if(activeMap.value.unlock>best.value)selected.value=mapList[0]!.key}
+ async function init(localOnly=false){if(!import.meta.client)return;guest.value=readGuest();if(localOnly)return;await account.init();await refresh();try{const key=localStorage.getItem(`iss-map-choice-${game}-${account.session.value?.user.id||'guest'}`);const stored=mapList.find(map=>map.key===key);if(stored&&stored.unlock<=best.value)selected.value=stored.key}catch{}if(activeMap.value.unlock>best.value)selected.value=mapList[0]!.key}
  function selectMap(key:string){const map=mapList.find(item=>item.key===key);if(!map||map.unlock>best.value)return;selected.value=key;try{localStorage.setItem(`iss-map-choice-${game}-${account.session.value?.user.id||'guest'}`,key)}catch{}}
  function guestLoadout(){const metric=game==='iss-runner'?guest.value.bestDistance:guest.value.bestScore;const map=activeMap.value.unlock<=metric?activeMap.value:mapList[0]!;return{...guest.value.levels,map_index:map.index}}
  function completeGuest(id:string,result:{coins:number;score:number;distance:number}){

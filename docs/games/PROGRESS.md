@@ -130,3 +130,23 @@ Se crean dos atlas originales con la herramienta image_gen integrada, cada uno d
 - Revisión visual de sprites integrados, estación, escudo e informe de precisión.
 
 Esta actualización es de arte y presentación: no modifica la física ni la economía, no crea migraciones nuevas y conserva meteor-v1/docking-v1 y su validación de servidor. Las portadas de catálogo de la versión inicial se conservan como ilustraciones, no como capturas.
+
+
+## Continuidad de partidas y orientación al jugador — 2026-11-02
+
+- Los tres juegos guardan una copia local del resultado oficial que no pudo enviarse. Se recupera al volver a la ruta o recargar y se reintenta al reconectar. Cada copia pertenece a un juego y una cuenta; no contiene contraseñas ni tokens añadidos por este mecanismo. El jugador puede descartarla para comenzar otra partida.
+- La recuperación respeta las dos horas de validez de la sesión desde su inicio, limita el tamaño del registro y rechaza datos corruptos, propietarios distintos y entradas inválidas. Los puntos y monedas siguen saliendo exclusivamente de la repetición en servidor. El guardado captura el registro enviado para evitar borrar otro resultado si la cuenta cambia durante la petición.
+- El inicio explícito como invitado carga el equipo local sin depender de la conexión de cuenta. La inicialización de cuenta puede reintentarse después de un fallo. Se registra una sola escucha de autenticación y se descartan respuestas antiguas de perfil/cartera/equipo cuando hay otra carga o cambia la cuenta.
+- Docking muestra las tres condiciones reales de contacto: desviación de ejes, deriva lateral y frenado. Añade tiempo restante, combustible bajo y una indicación contextual para frenar o estabilizar.
+- Meteor muestra el objetivo activo y su avance provisional durante la partida. Los tres informes indican el siguiente mapa, el récord necesario y cuánto falta. Los informes largos permiten desplazarse sin perder los primeros elementos o los botones.
+- El progreso invitado rechaza valores infinitos y conserva la copia en memoria si el navegador deja de permitir leer el almacenamiento.
+
+### Verificación
+
+- 19 pruebas de reglas, recursos y recuperación: propietarios, caducidad, registros corruptos, límites de tamaño, progreso finito e indicadores de contacto contrastados con el motor en los tres mapas.
+- test-game-recovery.mjs termina una partida real de Meteor y prueba los tres juegos con transporte simulado: envío fallido, recarga, recuperación, reintento por reconexión, eliminación de la copia guardada e inicio como invitado con el servicio de perfil fallando. No crea cuentas ni inserta resultados reales en Supabase.
+- Regresiones de móvil, horizontal, teléfono pequeño y escritorio; controles, compras locales, misiones, pausa, navegación y limpieza del motor.
+- Partidas completas de Meteor y Docking: informe, acoplamiento, una sola recompensa local y reinicio.
+- Compilación de producción correcta. La comprobación de tipos sigue señalando errores previos en mapa, galería y predicciones; los archivos de juegos modificados no presentan errores propios.
+
+El mecanismo conserva resultados de partidas terminadas; no reanuda una partida en curso tras cerrar la página. La copia depende del almacenamiento del navegador. Si está bloqueado o lleno, se avisa para mantener la pantalla abierta y reintentar. La actualización se publica en debelop; el despliegue web en Hostinger sigue siendo una operación independiente.

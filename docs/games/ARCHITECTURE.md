@@ -77,3 +77,12 @@ ArcadeGame incorpora fase ending antes de over. El motor detiene la física al t
 El sonido es opcional y local, separado de las reglas. El modo silenciado se recuerda; se liberan nodos y AudioContext al salir. Un error de carga de sprites devuelve al inicio con mensaje y posibilidad de reintentar.
 
 La prueba test-arcade-finish.mjs usa el reloj de Playwright para acelerar el tiempo de navegador y entradas reales de teclado/interfaz. Alinea la nave de Docking por la telemetría visible y frena antes del contacto; no fuerza el estado success ni el resultado. En Meteor elige una semilla de ensayo para comprobar la derrota y el reinicio. Verifica que la pantalla de resultados no duplica la recompensa local.
+
+
+## Recuperación de resultados terminados
+
+usePendingGameRun conserva una copia acotada con runId, userId, startedAt, ticks y eventos. La clave local incluye juego y propietario. decodePending comprueba estructura, entradas, orden de ticks y límite de dos horas desde el inicio. Al autenticar otra cuenta se cambia el contexto visible sin eliminar las copias de otras cuentas. Tras guardar o descartar se elimina únicamente el registro coincidente; una respuesta retrasada no elimina el resultado de otra partida.
+
+RunnerGame y ArcadeGame reintentan al recuperar la copia o recibir online. La petición usa el token actual y el servidor conserva la comprobación de propietario, reglas protegidas, reproducción e idempotencia anteriores. El almacenamiento local no acredita monedas. No hay nuevas tablas, políticas, migraciones ni versiones de física en este cambio.
+
+presentation.ts contiene límites de presentación de Docking y normalización de progreso local. Una prueba contrasta las condiciones del HUD con el contacto simulado para evitar que un indicador verde prometa un acoplamiento inválido. Los informes muestran desbloqueos a partir del récord confirmado/local del contexto actual, sin contar resultados oficiales pendientes de validar.
