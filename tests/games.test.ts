@@ -164,3 +164,20 @@ test('map difficulty changes the world, and objectives remain capped',()=>{
  assert.equal(Object.values(worldMaps).flat().length,9)
  assert.deepEqual(advanceArcadeMissions({score:300,coins:18,plays:2},{score:100,coins:4}),{score:300,coins:22,plays:3})
 })
+
+import {readFileSync} from 'node:fs'
+test('generated sprite packs have alpha, valid non-overlapping frames and bounded file sizes',()=>{
+ const packs=JSON.parse(readFileSync('public/games/arcade/v2/frames.json','utf8'))
+ for(const pack of Object.values(packs) as any[]){
+  const png=readFileSync(`public/games/arcade/v2/${pack.image}`)
+  assert.equal(png.toString('hex',0,8),'89504e470d0a1a0a')
+  assert.equal(png.readUInt32BE(16),pack.width);assert.equal(png.readUInt32BE(20),pack.height)
+  assert.equal(png[25],6,'RGBA transparency required')
+  assert.ok(png.length<2_000_000)
+  const frames=Object.values(pack.frames) as any[];assert.equal(frames.length,4)
+  for(let i=0;i<frames.length;i++){
+   const a=frames[i];assert.ok(a.x>=0&&a.y>=0&&a.width>0&&a.height>0&&a.x+a.width<=pack.width&&a.y+a.height<=pack.height)
+   for(let j=i+1;j<frames.length;j++){const b=frames[j];assert.ok(a.x+a.width<=b.x||b.x+b.width<=a.x||a.y+a.height<=b.y||b.y+b.height<=a.y,'Frames must not overlap')}
+  }
+ }
+})

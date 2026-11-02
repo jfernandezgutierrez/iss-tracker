@@ -1,0 +1,64 @@
+{
+  "meteor": {
+    "image": "meteor-atlas.png",
+    "width": 1254,
+    "height": 1254,
+    "frames": {
+      "ship": {
+        "x": 62,
+        "y": 64,
+        "width": 504,
+        "height": 486
+      },
+      "rock": {
+        "x": 671,
+        "y": 60,
+        "width": 546,
+        "height": 518
+      },
+      "crystal": {
+        "x": 135,
+        "y": 655,
+        "width": 358,
+        "height": 532
+      },
+      "shield": {
+        "x": 691,
+        "y": 678,
+        "width": 506,
+        "height": 500
+      }
+    }
+  },
+  "docking": {
+    "image": "docking-atlas.png",
+    "width": 1254,
+    "height": 1254,
+    "frames": {
+      "station": {
+        "x": 12,
+        "y": 22,
+        "width": 603,
+        "height": 583
+      },
+      "ship": {
+        "x": 666,
+        "y": 63,
+        "width": 549,
+        "height": 499
+      },
+      "port": {
+        "x": 35,
+        "y": 652,
+        "width": 557,
+        "height": 533
+      },
+      "flame": {
+        "x": 873,
+        "y": 743,
+        "width": 136,
+        "height": 374
+      }
+    }
+  }
+}

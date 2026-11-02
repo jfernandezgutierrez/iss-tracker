@@ -110,3 +110,23 @@ Migración 20261102121130_arcade_worlds_progression.sql aplicada: game_maps, gam
 ### Límites
 Los mapas y mejoras locales pueden manipularse desde el dispositivo: nunca se usan como autoridad para una cuenta ni una clasificación oficial. Sin Web Locks, dos pestañas antiguas del mismo navegador no ofrecen la misma garantía de serialización local; las compras de cuenta siguen siendo atómicas en la base de datos.
 El código necesita desplegarse junto al servidor nuevo en Hostinger. GitHub y migración remota no equivalen a publicación de la web.
+
+## Sprites y acabado de los dos juegos — 2026-11-02
+
+Se crean dos atlas originales con la herramienta image_gen integrada, cada uno de 1254×1254 píxeles RGBA con fondo transparente. Se guardan sin alterar en public/games/arcade/v2. Los sprites se delimitan mediante frames.json, calculado con scripts/inspect-arcade-atlases.py: no se asume una medida de salida que el generador no haya respetado.
+
+- Meteor: nave con cabina azul y motores ámbar, asteroide detallado, cristal de energía y escudo transparente.
+- Docking: estación original con paneles solares, nave de aproximación, puerto de acoplamiento y llama RCS.
+- Integración real en Phaser y en el hangar. Solo se descarga el atlas del juego elegido; los sprites anteriores quedan conservados como recursos de la primera versión.
+- Animación de propulsores y chorros laterales, inclinación de la nave, rotación de meteoritos, cristal oscilante, escudo pulsante, partículas y texto de recogida. Los mapas tienen fondos visualmente diferenciados.
+- Sonido opcional generado con Web Audio, silenciado por defecto y configurable en el perfil del juego. Osciladores desconectados al terminar y contexto cerrado al salir.
+- Secuencia final de 1,15 segundos: explosión o acoplamiento antes de mostrar el informe. Se bloquea el reinicio durante esa transición. El temporizador se elimina al salir.
+- Informe con duración, monedas, puntos y precisión/integridad, más reintento de guardado y reinicio.
+
+### Verificación de cierre
+- 15 pruebas de reglas y recursos: se añade validación de transparencia RGBA, tamaño de archivos, dimensiones y ausencia de solapamientos de fotogramas.
+- Regresión de navegador móvil y escritorio para ambos juegos: controles, mapas, mejoras, pausa, persistencia, orientación y salida sin canvas residual.
+- scripts/test-arcade-finish.mjs juega partidas completas con controles de la interfaz y reloj de navegador acelerado. Comprueba derrota de Meteor, acoplamiento correcto de Docking, secuencia final, informe, una sola recompensa local y reinicio de ambos. No inserta puntuaciones manualmente ni usa cuentas de prueba.
+- Revisión visual de sprites integrados, estación, escudo e informe de precisión.
+
+Esta actualización es de arte y presentación: no modifica la física ni la economía, no crea migraciones nuevas y conserva meteor-v1/docking-v1 y su validación de servidor. Las portadas de catálogo de la versión inicial se conservan como ilustraciones, no como capturas.

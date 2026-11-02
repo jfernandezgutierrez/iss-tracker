@@ -52,3 +52,19 @@ Generador reproducible: scripts/generate-arcade-assets.py (Pillow). Todo el arte
 | docking-cover.png | 960×540 | Portada de ISS Docking |
 
 Los cristales, estrellas, retículas, rejillas y escudos se dibujan con gráficos Phaser reutilizados. Meteor mantiene pools de 32 asteroides y 32 cristales; las reglas prueban el límite de objetos simultáneos. Los iconos y tarjetas de destino son SVG/CSS propios. No se carga ningún recurso arcade al visitar la web principal.
+
+## Atlas gráficos v2 — image_gen integrada
+
+Fecha: 2026-11-02. Dos paquetes raster originales creados con la herramienta integrada image_gen (sin CLI ni claves API). Los prompts completos se conservan en SPRITE_PROMPTS.md.
+
+| Archivo | Dimensiones y formato | Objetos |
+|---|---|---|
+| public/games/arcade/v2/meteor-atlas.png | 1254×1254, PNG RGBA, 1,48 MB | Nave, asteroide, cristal y escudo |
+| public/games/arcade/v2/docking-atlas.png | 1254×1254, PNG RGBA, 1,39 MB | Estación, nave, puerto y llama RCS |
+| public/games/arcade/v2/frames.json | JSON | Ocho rectángulos reales, sin solapamiento |
+
+Las fuentes PNG se copian tal como las devuelve image_gen; no se recortan ni se pintan mediante otro generador. scripts/inspect-arcade-atlases.py inspecciona dimensiones y alfa para escribir metadatos de encuadre. Phaser registra los frames sobre la textura original y los anima mediante movimiento, rotación, escala y transparencia. No se presentan los cuatro objetos de cada atlas como una animación de cuatro fotogramas.
+
+Se carga únicamente el paquete del juego seleccionado al entrar en su pantalla; el motor Phaser se importa al comenzar. El hangar muestra su objeto principal con encuadre CSS del atlas. El fondo es realmente transparente, incluido el centro del puerto. Los recursos de la primera versión permanecen como respaldo e ilustraciones históricas.
+
+Efectos de propulsión, partículas de impacto/recogida, medidores y fondos por mapa se dibujan en el motor con límites de objetos. Se utilizan hasta 80 partículas, seis etiquetas y pools fijos de 32 meteoritos y 32 cristales. El arte nuevo usa filtrado suave para conservar detalle al reducirlo a móvil; no fuerza pixel art sobre imágenes pintadas.

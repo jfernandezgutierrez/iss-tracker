@@ -68,3 +68,12 @@ game_objectives tiene RLS de propietario y ningún permiso de escritura del clie
 Las puntuaciones mantienen la fórmula existente score = distance + coins × 10. En Meteor distance representa el avance de la patrulla (diez unidades por segundo); en Docking, metros de aproximación. La clasificación solo muestra los puntos en estos juegos y filtra tanto game_id como rules_version. Los registros de los distintos juegos no se mezclan.
 
 Mapas: Runner modifica velocidad, anchura del corredor y consumo; Meteor modifica frecuencia y velocidad de meteoritos; Docking modifica distancia, combustible y tolerancias. Los parámetros salen exclusivamente del loadout de sesión para las partidas oficiales. Los mapas del invitado se desbloquean con sus récords locales y son independientes de los de su cuenta.
+
+## Finalización visual de Meteor y Docking
+Los atlas v2 están en public/games/arcade/v2, con frames de tamaño real. La escena carga solo el atlas elegido, registra los recortes como frames de textura y usa esos objetos en la partida. Las animaciones visuales son independientes del contador determinista: no afectan a colisiones, puntuación ni repetición en servidor.
+
+ArcadeGame incorpora fase ending antes de over. El motor detiene la física al terminar, mantiene brevemente animación de impacto/acoplamiento y comunica un único resultado. El temporizador de interfaz pasa al informe tras 1,15 s y se limpia al desmontar. Los menús y el reinicio se bloquean durante esa transición. El guardado conserva el identificador de partida y la idempotencia previos.
+
+El sonido es opcional y local, separado de las reglas. El modo silenciado se recuerda; se liberan nodos y AudioContext al salir. Un error de carga de sprites devuelve al inicio con mensaje y posibilidad de reintentar.
+
+La prueba test-arcade-finish.mjs usa el reloj de Playwright para acelerar el tiempo de navegador y entradas reales de teclado/interfaz. Alinea la nave de Docking por la telemetría visible y frena antes del contacto; no fuerza el estado success ni el resultado. En Meteor elige una semilla de ensayo para comprobar la derrota y el reinicio. Verifica que la pantalla de resultados no duplica la recompensa local.

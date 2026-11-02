@@ -110,3 +110,9 @@ Meteor Dodge e ISS Docking ya son jugables. Los tres juegos ofrecen mapas y equi
 - Arte reproducible: `scripts/generate-arcade-assets.py`.
 - Navegador: `GAMES_TEST_URL=http://localhost:3000 node scripts/test-arcade-browser.mjs`.
 - Seguridad de mapas, equipo y misiones: `tests/arcade-security.sql`, transacción con rollback.
+
+### Sprites y pruebas de partida completa
+
+Los atlas finales de Meteor Dodge e ISS Docking están en `public/games/arcade/v2/`; su procedencia y prompts se documentan en `docs/games/SPRITE_PROMPTS.md`. Se incluyen animaciones visuales, sonido opcional y secuencia final antes del informe.
+
+Para comprobar el cierre y reinicio de ambos juegos: `GAMES_TEST_URL=http://localhost:3000 node scripts/test-arcade-finish.mjs`. Esta prueba acelera el reloj de navegador y usa los controles del juego, sin escribir resultados ni crear cuentas.
