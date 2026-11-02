@@ -1,0 +1,45 @@
+begin;
+select set_config('arcade_test.uid',gen_random_uuid()::text,true);
+insert into auth.users(id,aud,role,email,raw_user_meta_data) values(current_setting('arcade_test.uid')::uuid,'authenticated','authenticated','arcade-qa@example.invalid','{}');
+select set_config('request.jwt.claim.sub',current_setting('arcade_test.uid'),true);
+update public.wallets set currency_balance=100 where user_id=auth.uid();
+do $$
+declare uid uuid:=auth.uid(); request uuid:=gen_random_uuid(); run jsonb; selected jsonb; gid uuid; blocked boolean:=false;
+begin
+ assert(select count(*)=9 from public.game_maps),'Expected nine maps';
+ assert(select count(*)=12 from public.upgrades),'Expected twelve upgrades';
+ perform public.purchase_game_equipment('meteor-dodge','handling',request);
+ perform public.purchase_game_equipment('meteor-dodge','handling',request);
+ assert(select currency_balance=65 from public.wallets where user_id=uid),'Duplicate purchase charged twice';
+ begin perform public.purchase_game_equipment('meteor-dodge','stabilizer',gen_random_uuid());exception when others then blocked:=true;end;
+ assert blocked,'Wrong game upgrade accepted';blocked:=false;
+ begin perform public.start_mapped_game('meteor-dodge','nebula');exception when others then blocked:=true;end;
+ assert blocked,'Locked map accepted';
+ run:=public.start_mapped_game('meteor-dodge','belt');
+ assert run->>'rules_version'='meteor-v1','Wrong meteor rules';
+ assert (run->'loadout'->>'handling')::integer=1,'Missing purchased equipment';
+ select game_id into gid from public.game_sessions where id=(run->>'id')::uuid;
+ insert into public.game_scores(user_id,game_id,session_id,score,distance,verification_status) values(uid,gid,(run->>'id')::uuid,300,300,'replayed');
+ assert(select progress=300 and completed_at is not null from public.game_objectives where user_id=uid and game_id=gid and mission_key='score'),'Objective not updated';
+ insert into public.game_scores(user_id,game_id,session_id,score,distance,verification_status) values(uid,gid,(run->>'id')::uuid,300,300,'replayed') on conflict(session_id)do nothing;
+ assert(select progress=1 from public.game_objectives where user_id=uid and game_id=gid and mission_key='plays'),'Duplicate score updated objective';
+ update public.game_sessions set started_at=now()-interval '5 seconds' where user_id=uid;
+ selected:=public.start_mapped_game('meteor-dodge','nebula');
+ assert(selected->'loadout'->>'map_index')::integer=1,'Unlocked map not selected';
+ update public.game_sessions set started_at=now()-interval '5 seconds' where user_id=uid;
+ selected:=public.start_mapped_game('iss-docking','training');
+ assert selected->>'rules_version'='docking-v1','Wrong docking rules';
+ assert not(selected->'loadout'?'handling'),'Equipment leaked between games';
+end $$;
+set local role authenticated;
+do $$begin
+ assert not has_table_privilege('authenticated','public.game_maps','UPDATE'),'Map mutation allowed';
+ assert not has_table_privilege('authenticated','public.game_objectives','INSERT'),'Objective mutation allowed';
+ assert not has_function_privilege('anon','public.start_mapped_game(text,text)','EXECUTE'),'Guest cloud starts allowed';
+ assert(select count(*)=3 from public.game_objectives),'Owner cannot read objectives';
+ perform set_config('request.jwt.claim.sub',gen_random_uuid()::text,true);
+ assert(select count(*)=0 from public.game_objectives),'Other player sees objectives';
+end $$;
+reset role;
+rollback;
+select 'map locks, equipment scope, atomic purchases, objectives, idempotency and RLS passed; fixtures rolled back' as result;

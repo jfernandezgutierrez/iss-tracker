@@ -50,3 +50,21 @@ RunnerGame.client.vue aloja todos los paneles y controles. No se monta una tiend
 Las misiones son medallas, sin recompensa monetaria añadida. El invitado usa una clave local independiente iss-flight-guest-missions; el progreso de una cuenta nunca se toma de ese almacenamiento. player_missions solo admite SELECT del propietario desde cliente. El trigger privado record_flight_missions se ejecuta en la transacción del resultado verificado, impidiendo progreso doble al reintentar. El modo de cada puntuación se deriva de su sesión protegida y permite filtrar la clasificación sin exponer semillas o loadouts de otros usuarios.
 
 La mejora double-jump conserva su identificador de compra, niveles y precio; en vuelo se presenta como Impulso reforzado y añade empuje vertical. El rescate de emergencia absorbe una derrota por impacto una vez por vuelo. El modo de plataformas previo conserva sus efectos originales. Las mejoras se capturan al comenzar: una compra durante la pausa no altera la partida actual.
+
+## Plataforma de progresión y juegos arcade — 2026-11-02
+
+El catálogo ya no tiene juegos conceptuales pendientes: Meteor Dodge e ISS Docking tienen páginas y una escena Phaser compartida con representación distinta por juego. app/components/games/ArcadeGame.client.vue aloja sus menús, HUD y controles. Phaser sigue cargándose bajo demanda y se destruyen instancia, ResizeObserver y escuchadores al abandonar una ruta.
+
+shared/games/arcade.ts contiene física y reglas deterministas a 60 pasos por segundo, con límite de tres minutos. Meteor registra direcciones discretas derivadas del arrastre y pulsos del escudo; un toque rápido se retiene hasta el siguiente paso de simulación para no perderlo entre fotogramas. Docking registra dirección e impulsor, calcula inercia/frenado y solo concede créditos de acoplamiento si se cumplen los límites de contacto. El servidor usa el modo de la sesión protegida, no un modo enviado libremente por el cliente.
+
+shared/games/progression.ts centraliza mapas, umbrales, descripciones y niveles de los dos juegos nuevos. Los valores de precio y límites se siembran en la migración y se comprueban en pruebas SQL. El servidor de base de datos es la autoridad para compras y desbloqueos de cuenta.
+
+useGameProgress mantiene separados el progreso invitado y el de la cuenta. El almacenamiento local se divide por juego y nunca se importa como saldo de cuenta. Cada partida local tiene identificador de deduplicación; las compras se serializan con navigator.locks cuando el navegador lo admite. Entrar o salir de una cuenta cambia el contexto y vuelve a cargar el saldo autorizado.
+
+start_mapped_game comprueba juego, mapa, mejor resultado verificado y mejoras del juego; crea semilla, rules_version y snapshot de loadout con map_index. No acepta niveles ni precio desde el navegador. purchase_game_equipment bloquea la cartera y valida el producto del juego; los identificadores idempotentes no se pueden reutilizar para otro juego/producto.
+
+game_objectives tiene RLS de propietario y ningún permiso de escritura del cliente. Su trigger solo se ejecuta para puntuaciones reproducidas de los juegos nuevos. La actualización comparte la transacción de puntuación, cartera y registro; un resultado duplicado no vuelve a incrementar objetivos.
+
+Las puntuaciones mantienen la fórmula existente score = distance + coins × 10. En Meteor distance representa el avance de la patrulla (diez unidades por segundo); en Docking, metros de aproximación. La clasificación solo muestra los puntos en estos juegos y filtra tanto game_id como rules_version. Los registros de los distintos juegos no se mezclan.
+
+Mapas: Runner modifica velocidad, anchura del corredor y consumo; Meteor modifica frecuencia y velocidad de meteoritos; Docking modifica distancia, combustible y tolerancias. Los parámetros salen exclusivamente del loadout de sesión para las partidas oficiales. Los mapas del invitado se desbloquean con sus récords locales y son independientes de los de su cuenta.

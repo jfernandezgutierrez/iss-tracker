@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 const route=useRoute()
-const flightPage=computed(()=>route.path.replace(/\/$/,'')==='/juegos/iss-runner')
+const flightPage=computed(()=>['/juegos/iss-runner','/juegos/meteor-dodge','/juegos/iss-docking'].includes(route.path.replace(/\/$/,'')))
 import GamePrivacy from '../components/games/GamePrivacy.vue'
 </script>
 <template>

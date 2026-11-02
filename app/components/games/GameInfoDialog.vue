@@ -32,7 +32,7 @@ onBeforeUnmount(() => { if (dialog.value?.open) restore() })
     <article v-if="game" class="stack-lg">
       <button autofocus type="button" class="btn btn-secondary close" @click="emit('close')">Cerrar ×</button>
       <img :src="game.image" :alt="game.imageAlt" width="800" height="450">
-      <div class="row"><span class="badge">{{ game.category }}</span><span class="badge badge-warning">{{ game.status === 'available' ? 'Disponible' : 'Próximamente' }}</span></div>
+      <div class="row"><span class="badge">{{ game.category }}</span><span class="badge" :class="game.status === 'available' ? 'badge-success' : 'badge-warning'">{{ game.status === 'available' ? 'Disponible' : 'Próximamente' }}</span></div>
       <h2 id="game-dialog-title">{{ game.title }}</h2>
       <GameDetails :game="game" />
 

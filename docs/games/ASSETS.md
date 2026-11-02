@@ -37,3 +37,18 @@ Nuevo arte propio, generado de forma reproducible por el mismo generador, sin re
 | flight-cover.png | 960×540 | Portada del catálogo, compuesta con los sprites originales |
 
 Los pasillos con ventanas, paneles, rayos, suelo y techo se dibujan con gráficos Phaser reutilizados. Los iconos de navegación, tienda y misiones son trazos SVG propios en GameIcon.vue. Los recursos runner-v1 se mantienen, pero no se cargan al jugar al modo de vuelo.
+
+## Recursos arcade — 2026-11-02
+
+Generador reproducible: scripts/generate-arcade-assets.py (Pillow). Todo el arte es original y se dibuja para este proyecto.
+
+| Archivo en public/games/arcade | Dimensiones | Uso |
+|---|---|---|
+| meteor-ship.png | 256×64 | Cuatro frames de nave, 64×64 |
+| docking-ship.png | 256×64 | Cuatro frames de nave de aproximación, 64×64 |
+| meteors.png | 256×64 | Cuatro asteroides originales, 64×64 |
+| station.png | 256×256 | Estación y puerto de acoplamiento |
+| meteor-cover.png | 960×540 | Portada de Meteor Dodge |
+| docking-cover.png | 960×540 | Portada de ISS Docking |
+
+Los cristales, estrellas, retículas, rejillas y escudos se dibujan con gráficos Phaser reutilizados. Meteor mantiene pools de 32 asteroides y 32 cristales; las reglas prueban el límite de objetos simultáneos. Los iconos y tarjetas de destino son SVG/CSS propios. No se carga ningún recurso arcade al visitar la web principal.

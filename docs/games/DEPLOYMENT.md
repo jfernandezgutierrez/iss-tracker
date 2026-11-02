@@ -32,3 +32,6 @@ En Auth → URL Configuration, configurar Site URL como https://isstrackerlive.e
 7. Sin solicitudes a Monetag y sin anuncios reales en el portal.
 
 La subida a GitHub en debelop permite revisar el trabajo antes de conectar esa rama al despliegue. No se cambió la configuración de producción ni se sobrescribió el sitio existente.
+
+## Actualización arcade y mapas
+Además de la migración móvil, aplicar arcade_worlds_progression al preparar otro entorno. Ya está aplicada al proyecto conectado; no repetir su DDL sobre las mismas tablas. Desplegar cliente y servidor juntos: los modos meteor-v1 y docking-v1 necesitan el validador nuevo. Comprobar /juegos/meteor-dodge, /juegos/iss-docking y el selector de mapas de Runner después del despliegue.

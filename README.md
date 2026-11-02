@@ -100,3 +100,13 @@ ISS Runner se juega con un solo control: mantener pulsado para subir y soltar pa
 Migración adicional: `supabase/migrations/20261102072406_runner_mobile_missions.sql`. El cliente, el servidor y la base de datos deben usar la versión correspondiente. Las misiones de cuenta solo avanzan tras validar el vuelo; las medallas de invitado se guardan en el dispositivo y no conceden monedas en la nube.
 
 Las pruebas de integración admiten `GAMES_TEST_MODE=flight` para comprobar la nueva sesión, repetición de controles, clasificación y progreso de misiones. `tests/flight-security.sql` verifica las políticas y los triggers con fixtures dentro de una transacción que se revierte.
+
+### Catálogo y progresión ampliados
+
+Meteor Dodge e ISS Docking ya son jugables. Los tres juegos ofrecen mapas y equipo por niveles; las cuentas usan compras atómicas y resultados reproducidos en servidor. Los invitados tienen saldo y progresión propios del dispositivo, separados de la cuenta.
+
+- Migración: `supabase/migrations/20261102121130_arcade_worlds_progression.sql`.
+- Reglas: `shared/games/arcade.ts` y `shared/games/progression.ts`.
+- Arte reproducible: `scripts/generate-arcade-assets.py`.
+- Navegador: `GAMES_TEST_URL=http://localhost:3000 node scripts/test-arcade-browser.mjs`.
+- Seguridad de mapas, equipo y misiones: `tests/arcade-security.sql`, transacción con rollback.

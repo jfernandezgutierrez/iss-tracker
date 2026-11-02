@@ -400,3 +400,6 @@ Al finalizar, presentar resumen de cambios, comprobaciones y siguientes pasos.
 
 ## Evolución aprobada — 2026-11-02
 El usuario pide centrar ISS Runner en móvil, con control de propulsor mantenido, avance automático, sprites mejorados y tienda, misiones y menús dentro del juego. Esta petición posterior sustituye la preferencia inicial de movimiento lateral libre para el modo predeterminado. Se conserva runner-v1 para compatibilidad de validación; Orbital Rush utiliza runner-flight-v2. Ver PROGRESS.md y ARCHITECTURE.md para decisiones y pruebas actuales.
+
+## Actualización de catálogo y progresión — 2026-11-02
+Meteor Dodge e ISS Docking dejan de ser conceptos y pasan a juego funcional. Se autoriza ampliar también la progresión de todo el portal: nueve mapas, equipo por juego y misiones con estado de progreso. El invitado puede conservar saldo y compras locales, sin transferirlos a una cuenta. Las partidas de cuenta se validan y desbloquean contenido únicamente en servidor. Los detalles actuales y sus pruebas están en PROGRESS.md.

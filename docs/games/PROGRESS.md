@@ -81,3 +81,32 @@ El código requiere desplegar cliente y servidor juntos para que el modo nuevo s
 - Integración real del modo de vuelo completada: acceso con dos cuentas desechables, inicio versionado, repetición del vuelo en servidor, guardado de la clasificación con runner-flight-v2 y misión contabilizada una sola vez pese a reintentos. Lectura cruzada y edición directa de misiones rechazadas.
 
 Nota de limpieza de pruebas (2026-11-02): las dos cuentas desechables de esta actualización siguen pendientes de retirada porque la confirmación de eliminación del conector Supabase caducó dos veces. Usan direcciones example.invalid y no se enviaron correos. Sus credenciales locales fueron eliminadas y no están en Git. La consulta acotada a esos dos identificadores se conserva en .cache/cleanup-mobile-fixtures.sql (ignorado) para terminar la limpieza cuando la conexión confirme la operación.
+
+## Progresión y resto del catálogo — 2026-11-02
+
+Petición: mejorar los demás juegos y ampliar mejoras, misiones y mapas de todo el portal.
+
+### Resultado
+- Meteor Dodge e ISS Docking pasan de conceptos a juegos funcionales, con inicio, pausa, resultado, perfil, manual, mapas, mejoras, misiones y récords dentro de su pantalla.
+- Meteor Dodge: nave arrastrable en móvil, movimiento con flechas/WASD, meteoritos y cristales, tres puntos de integridad, escudo con recarga y patrulla de tres minutos.
+- ISS Docking: dos ejes con inercia, aproximación, frenado, combustible y acoplamiento validado por alineación, inercia lateral y velocidad. Es un juego, no entrenamiento real.
+- Nueve destinos en total, tres por juego. Cambian dificultad y aspecto; los puertos de Docking también cambian distancia, combustible y tolerancia. La elección se recuerda por invitado/cuenta.
+- Doce tipos de mejora: seis del traje, tres de la nave arcade y tres del simulador. Cada una tiene niveles, precio creciente, estado comprado y efecto probado. Las compras solo afectan a la siguiente partida.
+- Nueve misiones: tres por juego. Progreso y medallas visibles, sin recompensas monetarias adicionales.
+- Invitados: saldo, mejoras, récord y misiones locales por juego. Las compras locales se serializan con Web Locks cuando está disponible. La interfaz explica que no se transfiere ese saldo a una cuenta.
+- Cuentas: cartera compartida, equipo filtrado por juego y objetivos calculados en la transacción del resultado verificado. El navegador no puede editar los mapas, desbloqueos o progreso oficial.
+- Runner integra el selector de mapas y el nuevo arsenal común, manteniendo su control de propulsor y sus registros anteriores.
+
+### Persistencia y seguridad
+Migración 20261102121130_arcade_worlds_progression.sql aplicada: game_maps, game_objectives, inicio de sesiones con mapa validado, compras por juego e idempotencia. Las funciones privilegiadas viven en games_private, comprueban auth.uid y tienen search_path vacío. El servidor reproduce meteor-v1 y docking-v1 con la misma lógica determinista del cliente antes de firmar resultados.
+
+### Pruebas
+- 14 pruebas de reglas: se conservan las anteriores y se añaden repetición de Meteor, escudo, memoria acotada, acoplamiento correcto en los tres mapas, rechazo de contacto rápido/desalineado, efectos de todas las nuevas mejoras y cambios de dificultad.
+- Prueba SQL transaccional: nueve mapas/doce mejoras, mapa bloqueado rechazado, mapa desbloqueado aceptado, equipo sin mezclar entre juegos, compra repetida cobrada una vez, objetivo actualizado una vez y RLS entre usuarios. Fixtures revertidos, sin cuentas nuevas persistentes.
+- Playwright en móvil y escritorio: ambas rutas, navegación interna, mapas bloqueados/seleccionados, compra local y persistencia, escudo con una pulsación rápida, arrastre, controles de Docking, pausa/tienda/reanudación, giro horizontal, integración de mapas/arsenal en Runner y limpieza del canvas al salir.
+- Compilación de producción verificada; tipos de archivos nuevos sin errores propios. Permanecen problemas de tipos previos en mapa/galería/predicciones.
+- Asesores Supabase: el aviso informativo de la tabla privada sin políticas sigue siendo esperado. También aparece la protección de contraseñas filtradas desactivada en la configuración Auth; no se cambia esa configuración ajena al juego en esta actualización. Referencia: https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection.
+
+### Límites
+Los mapas y mejoras locales pueden manipularse desde el dispositivo: nunca se usan como autoridad para una cuenta ni una clasificación oficial. Sin Web Locks, dos pestañas antiguas del mismo navegador no ofrecen la misma garantía de serialización local; las compras de cuenta siguen siendo atómicas en la base de datos.
+El código necesita desplegarse junto al servidor nuevo en Hostinger. GitHub y migración remota no equivalen a publicación de la web.

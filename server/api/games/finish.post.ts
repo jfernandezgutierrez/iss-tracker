@@ -1,6 +1,7 @@
 import { createHmac } from 'node:crypto'
 import { replayRunner } from '#shared/games/runner'
 import { replayFlight, FLIGHT_VERSION } from '#shared/games/flight'
+import { replayArcade, ARCADE_VERSION, type ArcadeMode } from '#shared/games/arcade'
 import { RULES_VERSION } from '#shared/games/config'
 import { gameUser } from '../../utils/gameUser'
 export default defineEventHandler(async (event) => {
@@ -15,9 +16,12 @@ export default defineEventHandler(async (event) => {
   const { data: run, error } = await supabase.from('game_sessions').select('*').eq('id', body.runId).eq('user_id', user.id).single()
   if (error || !run) throw createError({ statusCode: 404, statusMessage: 'Partida desconocida.' })
   if (run.result) return run.result
-  if (run.rules_version !== RULES_VERSION && run.rules_version !== FLIGHT_VERSION) throw createError({ statusCode: 409, statusMessage: 'La versión de la partida ha cambiado. Inicia otra partida.' })
+  if (run.rules_version !== RULES_VERSION && run.rules_version !== FLIGHT_VERSION && !Object.values(ARCADE_VERSION).includes(run.rules_version)) throw createError({ statusCode: 409, statusMessage: 'La versión de la partida ha cambiado. Inicia otra partida.' })
   let result
-  try { result = (run.rules_version === FLIGHT_VERSION ? replayFlight : replayRunner)(run.seed, run.loadout, body.events, body.ticks) }
+  try {
+    const arcadeMode = (Object.keys(ARCADE_VERSION) as ArcadeMode[]).find(mode => ARCADE_VERSION[mode] === run.rules_version)
+    result = arcadeMode ? replayArcade(arcadeMode, run.seed, run.loadout, body.events, body.ticks) : (run.rules_version === FLIGHT_VERSION ? replayFlight : replayRunner)(run.seed, run.loadout, body.events, body.ticks)
+  }
   catch (error) { throw createError({ statusCode: 422, statusMessage: error instanceof Error ? error.message : 'Partida inválida.' }) }
   const payload = [run.id, user.id, result.score, result.coins, result.distance, result.ticks].join(':')
   const proof = createHmac('sha256', String(config.gameVerificationSecret)).update(payload).digest('hex')

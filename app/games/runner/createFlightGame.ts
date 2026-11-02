@@ -49,7 +49,7 @@ export function mountFlight(P: typeof Phaser, parent: HTMLElement, options: Flig
    paint(){
      const cameraX=state.x-logicalWidth*.26
      this.cameras.main.scrollX=cameraX
-     const biome=Math.floor(state.x/14000)%3
+     const biome=(state.mapIndex+Math.floor(state.x/14000))%3
      const glow=[0x3aa8c6,0x9e71db,0x5db397][biome]!
      this.backdrop.clear().fillStyle(0x091529).fillRect(0,0,logicalWidth,height)
      const shift=cameraX*.17%200

@@ -9,9 +9,9 @@ definePageMeta({ layout: 'games' })
 useHead({
   title: 'Juegos espaciales',
   meta: [
-    { name: 'description', content: 'Juega gratis a ISS Runner y descubre los próximos juegos espaciales de ISS Tracker.' },
+    { name: 'description', content: 'Juega gratis a ISS Runner, Meteor Dodge e ISS Docking: vuelo arcade, supervivencia y precisión orbital.' },
     { property: 'og:title', content: 'Juegos espaciales · ISS Tracker' },
-    { property: 'og:description', content: 'Explora el futuro catálogo de aventuras espaciales de ISS Tracker.' },
+    { property: 'og:description', content: 'Tres aventuras espaciales con mapas, mejoras y misiones.' },
     { property: 'og:url', content: 'https://isstrackerlive.es/juegos' },
   ],
   link: [{ rel: 'canonical', href: 'https://isstrackerlive.es/juegos' }],
@@ -24,11 +24,11 @@ const selectedGame = ref<PortalGame | null>(null)
     <section class="intro stack">
       <p class="eyebrow">Una nueva misión te espera</p>
       <h1 class="display-title">Juegos espaciales</h1>
-      <p class="section-subtitle">Explora, supera desafíos y descubre otra forma de vivir el espacio. ISS Runner ya está disponible. Nuevas misiones llegarán próximamente.</p>
+      <p class="section-subtitle">Explora, supera desafíos y descubre otra forma de vivir el espacio. Tres juegos disponibles, con mapas, mejoras y misiones para seguir explorando.</p>
     </section>
     <PlayerSummary />
     <section aria-labelledby="catalog-title" class="stack-lg">
-      <div><h2 id="catalog-title" class="section-title">Elige tu próxima aventura</h2><p class="section-subtitle">Empieza con ISS Runner o descubre los conceptos de nuestras próximas misiones.</p></div>
+      <div><h2 id="catalog-title" class="section-title">Elige tu próxima aventura</h2><p class="section-subtitle">Elige entre vuelo con propulsor, supervivencia entre meteoritos o acoplamientos de precisión.</p></div>
       <div class="game-grid">
         <article v-for="game in games" :key="game.slug" class="game-card" :class="{ featured: game.featured }">
           <img :src="game.image" :alt="game.imageAlt" width="800" height="450">
@@ -42,7 +42,7 @@ const selectedGame = ref<PortalGame | null>(null)
         </article>
       </div>
     </section>
-    <p class="text-soft concept-note">Portadas conceptuales. Meteor Dodge e ISS Docking estarán disponibles más adelante.</p>
+    <p class="text-soft concept-note">Gráficos originales. Juega como invitado con progreso local o usa tu cuenta para guardar resultados verificados.</p>
     <GameAdSlot placement="catalog" /><GameInfoDialog :game="selectedGame" @close="selectedGame = null" />
   </main>
 </template>

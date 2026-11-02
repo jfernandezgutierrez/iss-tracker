@@ -121,3 +121,46 @@ test('flight upgrades, mission progress and rescue have actual effects',()=>{
  assert.deepEqual(progress,{distance:120,coins:20,flights:3})
  assert.deepEqual(advanceMissions(progress,{distance:60,coins:2}),progress)
 })
+
+import {createArcade,stepArcade,arcadeResult,replayArcade,type ArcadeInput,type ArcadeEvent} from '../shared/games/arcade'
+import {worldMaps,cleanArcadeLoadout,advanceArcadeMissions} from '../shared/games/progression'
+test('Meteor Dodge has deterministic results, shield protection and bounded hazards',()=>{
+ const state=createArcade('meteor-dodge',77)
+ while(!state.dead){stepArcade(state,{x:0,y:0,boost:false});assert.ok(state.rocks.length<32)}
+ assert.deepEqual(replayArcade('meteor-dodge',77,{},[],state.tick),arcadeResult(state))
+ assert.throws(()=>replayArcade('meteor-dodge',77,{},[],state.tick+1))
+ assert.throws(()=>replayArcade('meteor-dodge',77,{},[{tick:0,x:2 as any,y:0,boost:false}],state.tick))
+ const protectedState=createArcade('meteor-dodge',1,{barrier:2})
+ protectedState.rocks.push({id:99,x:320,y:738,vx:0,vy:120,radius:35,crystal:false})
+ stepArcade(protectedState,{x:0,y:0,boost:true})
+ assert.equal(protectedState.health,3);assert.ok(protectedState.shieldUntil>=240)
+})
+test('ISS Docking can be completed on every map with legitimate controls and replayed',()=>{
+ for(let map=0;map<3;map++){
+  const loadout={map_index:map};const state=createArcade('iss-docking',17,loadout);const events:ArcadeEvent[]=[];let last:ArcadeInput={x:0,y:0,boost:false}
+  while(!state.dead){
+   const control=(offset:number,velocity:number)=>(offset+velocity*.8>1?-1:offset+velocity*.8< -1?1:0)as -1|0|1
+   const input={x:control(state.x,state.vx),y:control(state.y,state.vy),boost:state.range>7}
+   if(input.x!==last.x||input.y!==last.y||input.boost!==last.boost){events.push({tick:state.tick,...input});last=input}
+   stepArcade(state,input)
+  }
+  assert.equal(state.success,true,`map ${map}: ${state.reason}`);assert.ok(state.coins>=35)
+  assert.deepEqual(replayArcade('iss-docking',17,loadout,events,state.tick),arcadeResult(state))
+ }
+})
+test('docking rejects a fast or misaligned contact and upgrades affect the simulation',()=>{
+ const failed=createArcade('iss-docking',1);failed.range=.001;failed.approach=3;stepArcade(failed,{x:0,y:0,boost:true});assert.equal(failed.success,false);assert.equal(failed.coins,0)
+ const normal=createArcade('iss-docking',1);const upgraded=createArcade('iss-docking',1,{tank:3,stabilizer:3,dampener:2})
+ assert.equal(upgraded.fuel-normal.fuel,60)
+ normal.vx=20;upgraded.vx=20;normal.approach=3;upgraded.approach=3
+ for(let i=0;i<30;i++){stepArcade(normal,{x:0,y:0,boost:false});stepArcade(upgraded,{x:0,y:0,boost:false})}
+ assert.ok(upgraded.vx<normal.vx);assert.ok(upgraded.approach<normal.approach)
+ const a=createArcade('meteor-dodge',1);const b=createArcade('meteor-dodge',1,{handling:3});stepArcade(a,{x:1,y:0,boost:false});stepArcade(b,{x:1,y:0,boost:false});assert.ok(b.x>a.x)
+ assert.equal(cleanArcadeLoadout('meteor-dodge',{handling:999,map_index:999}).handling,3)
+ assert.equal(cleanArcadeLoadout('meteor-dodge',{handling:999,map_index:999}).map_index,2)
+})
+test('map difficulty changes the world, and objectives remain capped',()=>{
+ const base=createFlight(3);const expert=createFlight(3,{map_index:2});stepFlight(base,false);stepFlight(expert,false);assert.ok(expert.x>base.x);assert.ok(expert.chunks[0]!.gate.gap<base.chunks[0]!.gate.gap)
+ assert.equal(Object.values(worldMaps).flat().length,9)
+ assert.deepEqual(advanceArcadeMissions({score:300,coins:18,plays:2},{score:100,coins:4}),{score:300,coins:22,plays:3})
+})
