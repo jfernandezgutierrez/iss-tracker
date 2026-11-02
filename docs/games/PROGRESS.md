@@ -79,3 +79,5 @@ Petición del usuario: experiencia centrada en móvil, tienda y misiones dentro 
 ### Despliegue
 El código requiere desplegar cliente y servidor juntos para que el modo nuevo se valide. La migración remota es aditiva y conserva la compatibilidad con el modo previo. La publicación en Hostinger sigue siendo un paso independiente del envío a GitHub.
 - Integración real del modo de vuelo completada: acceso con dos cuentas desechables, inicio versionado, repetición del vuelo en servidor, guardado de la clasificación con runner-flight-v2 y misión contabilizada una sola vez pese a reintentos. Lectura cruzada y edición directa de misiones rechazadas.
+
+Nota de limpieza de pruebas (2026-11-02): las dos cuentas desechables de esta actualización siguen pendientes de retirada porque la confirmación de eliminación del conector Supabase caducó dos veces. Usan direcciones example.invalid y no se enviaron correos. Sus credenciales locales fueron eliminadas y no están en Git. La consulta acotada a esos dos identificadores se conserva en .cache/cleanup-mobile-fixtures.sql (ignorado) para terminar la limpieza cuando la conexión confirme la operación.
